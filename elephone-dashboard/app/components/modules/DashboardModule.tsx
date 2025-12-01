@@ -176,24 +176,24 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
   return (
     <div className="animate-fadeIn">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-16 pb-6">
         <div>
-          <h1 className="text-[32px] font-bold text-[#F1F5F9] mb-2">Dashboard de Gestión</h1>
-          <p className="text-[14px] text-[#64748B]">
+          <h1 className="text-[32px] font-bold text-[#F1F5F9] mb-4">Dashboard de Gestión</h1>
+          <p className="text-[14px] text-[#64748B] leading-relaxed">
             {rangoFecha === 'HOY' ? 'Reporte del día • ' : rangoFecha === 'PERSONALIZADO' ? `${inicio} al ${fin} • ` : `Reporte ${rangoFecha.toLowerCase()} • `}
             {new Date().toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <div className="flex gap-3">
           <div className="text-right">
-            <p className="text-[12px] text-[#64748B]">Total Stock</p>
+            <p className="text-[12px] text-[#64748B] mb-2">Total Stock</p>
             <strong className="text-[18px] font-bold text-[#0EA5E9]">{productosDisponibles.length} unidades</strong>
           </div>
         </div>
       </div>
 
       {/* Selector de rango de fechas */}
-      <div className="bg-[#1E293B] border border-[#334155] rounded-2xl p-6 mb-8">
+      <div className="bg-[#1E293B] border border-[#334155] rounded-2xl p-8 mb-16">
         <div className="flex gap-2 mb-4 flex-wrap">
           {['HOY', 'AYER', 'SEMANA', 'MES', 'PERSONALIZADO'].map(rango => (
             <button
@@ -239,28 +239,28 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
 
       {/* Estado vacío cuando no hay productos */}
       {productos.length === 0 ? (
-        <div className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] border-2 border-dashed border-[#334155] rounded-2xl p-10 mb-10 text-center">
-          <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-[#0EA5E920] flex items-center justify-center">
-            <Package size={40} className="text-[#0EA5E9]" />
+        <div className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] border-2 border-dashed border-[#334155] rounded-2xl p-16 mb-16 text-center">
+          <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-[#0EA5E920] flex items-center justify-center">
+            <Package size={48} className="text-[#0EA5E9]" />
           </div>
-          <h3 className="text-[24px] font-bold text-[#F1F5F9] mb-3">No hay datos disponibles</h3>
-          <p className="text-[16px] text-[#64748B] mb-6">Comienza registrando productos y ventas para ver el análisis del dashboard</p>
+          <h3 className="text-[26px] font-bold text-[#F1F5F9] mb-5">No hay datos disponibles</h3>
+          <p className="text-[16px] text-[#64748B] mb-8 leading-relaxed">Comienza registrando productos y ventas para ver el análisis del dashboard</p>
           <div className="flex gap-3 justify-center">
-            <span className="px-4 py-2 bg-[#0F172A] border border-[#334155] rounded-lg text-[#94A3B8] text-[14px]">💡 Tip: Ve a &quot;Ingresos&quot; para agregar productos</span>
+            <span className="px-5 py-3 bg-[#0F172A] border border-[#334155] rounded-lg text-[#94A3B8] text-[14px]">💡 Tip: Ve a &quot;Ingresos&quot; para agregar productos</span>
           </div>
         </div>
       ) : (
         <>
       {/* Métricas principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
         {/* Ventas Totales */}
         <div className="bg-gradient-to-br from-[#0EA5E933] to-[#1E293B] border border-[#0EA5E9] rounded-2xl p-7 flex gap-5 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(14,165,233,0.2)] transition-all min-h-[160px]">
           <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#0EA5E9] to-[#0284C7] flex items-center justify-center flex-shrink-0">
             <DollarSign size={32} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-[#94A3B8] text-[15px] mb-2 font-medium">Ventas Totales</p>
-            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-2 leading-none">${(montoVentas / 1000000).toFixed(2)}M</h2>
+            <p className="text-[#94A3B8] text-[15px] mb-3 font-medium">Ventas Totales</p>
+            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-3 leading-none">${(montoVentas / 1000000).toFixed(2)}M</h2>
             <span className={`inline-flex items-center gap-1.5 text-[13px] font-semibold px-3 py-1.5 rounded-lg ${cambioVentas >= 0 ? 'text-[#10B981] bg-[#10B98120]' : 'text-[#EF4444] bg-[#EF444420]'}`}>
               {cambioVentas >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
               {Math.abs(cambioVentas).toFixed(1)}% vs período anterior
@@ -274,8 +274,8 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
             <TrendingUp size={32} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-[#94A3B8] text-[15px] mb-2 font-medium">Utilidad Neta</p>
-            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-2 leading-none">${(utilidadTotal / 1000).toFixed(0)}K</h2>
+            <p className="text-[#94A3B8] text-[15px] mb-3 font-medium">Utilidad Neta</p>
+            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-3 leading-none">${(utilidadTotal / 1000).toFixed(0)}K</h2>
             <span className="text-[14px] text-[#10B981] font-semibold">
               Margen {((utilidadTotal/montoVentas)*100).toFixed(1)}%
             </span>
@@ -288,8 +288,8 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
             <ShoppingBag size={32} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-[#94A3B8] text-[15px] mb-2 font-medium">Unidades Vendidas</p>
-            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-2 leading-none">{unidadesVendidas}</h2>
+            <p className="text-[#94A3B8] text-[15px] mb-3 font-medium">Unidades Vendidas</p>
+            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-3 leading-none">{unidadesVendidas}</h2>
             <span className={`inline-flex items-center gap-1.5 text-[13px] font-semibold px-3 py-1.5 rounded-lg ${cambioUnidades >= 0 ? 'text-[#10B981] bg-[#10B98120]' : 'text-[#EF4444] bg-[#EF444420]'}`}>
               {cambioUnidades >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
               {Math.abs(cambioUnidades).toFixed(1)}% vs anterior
@@ -303,8 +303,8 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
             <Target size={32} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-[#94A3B8] text-[15px] mb-2 font-medium">Ticket Promedio</p>
-            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-2 leading-none">${(ticketPromedio / 1000).toFixed(0)}K</h2>
+            <p className="text-[#94A3B8] text-[15px] mb-3 font-medium">Ticket Promedio</p>
+            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-3 leading-none">${(ticketPromedio / 1000).toFixed(0)}K</h2>
             <span className="text-[14px] text-[#64748B]">por transacción</span>
           </div>
         </div>
@@ -315,8 +315,8 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
             <Package size={32} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-[#94A3B8] text-[15px] mb-2 font-medium">Stock Disponible</p>
-            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-2 leading-none">{productosDisponibles.length}</h2>
+            <p className="text-[#94A3B8] text-[15px] mb-3 font-medium">Stock Disponible</p>
+            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-3 leading-none">{productosDisponibles.length}</h2>
             <span className="text-[14px] text-[#64748B]">unidades en inventario</span>
           </div>
         </div>
@@ -327,15 +327,15 @@ export default function DashboardModule({ productos }: DashboardModuleProps) {
             <Percent size={32} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-[#94A3B8] text-[15px] mb-2 font-medium">ROI Período</p>
-            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-2 leading-none">{((utilidadTotal / costoTotal) * 100).toFixed(1)}%</h2>
+            <p className="text-[#94A3B8] text-[15px] mb-3 font-medium">ROI Período</p>
+            <h2 className="text-[36px] font-bold text-[#F1F5F9] mb-3 leading-none">{((utilidadTotal / costoTotal) * 100).toFixed(1)}%</h2>
             <span className="text-[14px] text-[#10B981]">retorno inversión</span>
           </div>
         </div>
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Gráfico de evolución de ventas */}
         <div className="lg:col-span-2 bg-[#1E293B] border border-[#334155] rounded-2xl p-6 hover:border-[#0EA5E9] hover:shadow-[0_8px_24px_rgba(14,165,233,0.1)] transition-all">
           <div className="mb-7">

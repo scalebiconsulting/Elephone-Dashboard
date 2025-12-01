@@ -101,12 +101,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0F172A] text-[#E2E8F0]">
+    <div className="h-screen bg-[#0F172A] text-[#E2E8F0]">
       {/* Sidebar */}
       <Sidebar activeModule={activeModule} onChangeModule={setActiveModule} />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden flex flex-col min-w-0 ml-[280px]">
+      <div className="fixed left-[300px] right-10 top-10 bottom-0 overflow-hidden flex flex-col">
         {/* Header */}
         <header className="h-20 bg-[#1E293B] border-b border-[#334155] px-8 flex items-center justify-between">
           <div>
@@ -121,8 +121,8 @@ export default function Home() {
               {productos.filter(p => p.estado === 'DISPONIBLE').length} productos disponibles
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
+          <div className="flex items-center gap-4 ">
+            <div className=" right-10">
               <p className="text-[12px] text-[#64748B]">Stock Valorizado</p>
               <strong className="text-[18px] font-bold text-[#10B981]">
                 ${(productos.filter(p => p.estado === 'DISPONIBLE').reduce((sum, p) => sum + p.costo, 0) / 1000000).toFixed(1)}M
@@ -132,7 +132,7 @@ export default function Home() {
         </header>
 
         {/* Module Content */}
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto p-10">
           {activeModule === 'dashboard' && (
             <DashboardModule productos={productos} />
           )}
