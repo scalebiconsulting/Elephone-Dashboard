@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import IngresosModule from './components/modules/IngresosModule';
+import InventarioModule from './components/modules/InventarioModule';
 
 export default function Home() {
   const [activeModule, setActiveModule] = useState('dashboard');
@@ -29,10 +30,7 @@ export default function Home() {
         )}
         
         {activeModule === 'inventario' && (
-          <div className="text-white">
-            <h1 className="text-3xl font-bold mb-4">Inventario</h1>
-            <p className="text-slate-400">Módulo en construcción</p>
-          </div>
+          <InventarioModule onChangeModule={setActiveModule} />
         )}
         
         {activeModule === 'permutas' && (

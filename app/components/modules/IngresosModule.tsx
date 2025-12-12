@@ -27,8 +27,8 @@ export default function IngresosModule() {
   const [garantiaCompra, setGarantiaCompra] = useState('');
 
   // Sección 4 - Estado del Equipo
-  const [block, setBlock] = useState('NO');
-  const [datosEquipos, setDatosEquipos] = useState('NO DATOS');
+  const [block, setBlock] = useState('');
+  const [datosEquipos, setDatosEquipos] = useState('');
   const [numeroSerie, setNumeroSerie] = useState('');
   const [imei1, setImei1] = useState('');
   const [imei2, setImei2] = useState('');
@@ -42,6 +42,7 @@ export default function IngresosModule() {
   // Sección 6 - Precios
   const [repuesto, setRepuesto] = useState('');
   const [pvpEfectivo, setPvpEfectivo] = useState('');
+  const [pvpCredito, setPvpCredito] = useState('');
   const [utilidad, setUtilidad] = useState('');
   const [utilidad2, setUtilidad2] = useState('');
   const [tresPorCiento, setTresPorCiento] = useState('');
@@ -57,8 +58,10 @@ export default function IngresosModule() {
   };
 
   // Generar MODELO2 dinámicamente (EQUIPO, SERIE, MODELO, GB, COLOR, CONDICION)
+  // Generar MODELO2 dinámicamente (EQUIPO, SERIE, MODELO, GB, COLOR, CONDICION)
   useEffect(() => {
-    const modelo2Generated = [equipo, serie, modelo, gb, color, condicion]
+    const gbConSufijo = gb ? `${gb} GB` : '';
+    const modelo2Generated = [equipo, serie, modelo, gbConSufijo, color, condicion]
       .filter(val => val.trim() !== '')
       .join(' ');
     setModelo2(modelo2Generated);
@@ -73,7 +76,52 @@ export default function IngresosModule() {
     }
   }, [imei1, imei2]);
 
+  // Generar SKU dinámicamente (3 EQUIPO + SERIE + - + 2 SUB MODELO + - + 2 COLOR + GB + 2 CONDICION)
+  useEffect(() => {
+    const equipoPart = equipo.slice(0, 3);
+    const seriePart = serie;
+    const subModeloPart = subModelo.slice(0, 2);
+    const colorPart = color.slice(0, 2);
+    const gbPart = gb;
+    const condicionPart = condicion.slice(0, 2);
+    
+    if (equipoPart || seriePart || subModeloPart || colorPart || gbPart || condicionPart) {
+      const skuGenerado = `${equipoPart}${seriePart}-${subModeloPart}-${colorPart}${gbPart}${condicionPart}`;
+      setSku(skuGenerado);
+    } else {
+      setSku('');
+    }
+  }, [equipo, serie, subModelo, color, gb, condicion]);
 
+  // Calcular UTILIDAD dinámicamente (PVP EFECTIVO - REPUESTO - COSTO)
+  useEffect(() => {
+    const pvpNum = parseInt(pvpEfectivo.replace(/\D/g, '')) || 0;
+    const repuestoNum = parseInt(repuesto.replace(/\D/g, '')) || 0;
+    const costoNum = parseInt(costo.replace(/\D/g, '')) || 0;
+    
+    const utilidadCalculada = pvpNum - repuestoNum - costoNum;
+    
+    if (pvpNum > 0 || repuestoNum > 0 || costoNum > 0) {
+      setUtilidad(utilidadCalculada >= 0 ? utilidadCalculada.toLocaleString('es-CL') : `-${Math.abs(utilidadCalculada).toLocaleString('es-CL')}`);
+    } else {
+      setUtilidad('');
+    }
+  }, [pvpEfectivo, repuesto, costo]);
+
+  // Calcular UTILIDAD2 dinámicamente (PVP CRÉDITO - COSTO - REPUESTO)
+  useEffect(() => {
+    const pvpCreditoNum = parseInt(pvpCredito.replace(/\D/g, '')) || 0;
+    const costoNum = parseInt(costo.replace(/\D/g, '')) || 0;
+    const repuestoNum = parseInt(repuesto.replace(/\D/g, '')) || 0;
+    
+    const utilidad2Calculada = pvpCreditoNum - costoNum - repuestoNum;
+    
+    if (pvpCreditoNum > 0 || costoNum > 0 || repuestoNum > 0) {
+      setUtilidad2(utilidad2Calculada >= 0 ? utilidad2Calculada.toLocaleString('es-CL') : `-${Math.abs(utilidad2Calculada).toLocaleString('es-CL')}`);
+    } else {
+      setUtilidad2('');
+    }
+  }, [pvpCredito, costo, repuesto]);
 
   const formatoPesosChilenos = (valor: string) => {
     const numero = valor.replace(/\D/g, '');
@@ -114,6 +162,7 @@ export default function IngresosModule() {
         metodoPago: metodoPago,
         repuesto: parseInt(repuesto.replace(/\D/g, '')) || 0,
         pvpEfectivo: parseInt(pvpEfectivo.replace(/\D/g, '')) || 0,
+        pvpCredito: parseInt(pvpCredito.replace(/\D/g, '')) || 0,
         utilidad: parseInt(utilidad.replace(/\D/g, '')) || 0,
         utilidad2: parseInt(utilidad2.replace(/\D/g, '')) || 0,
         tresPorCiento: parseInt(tresPorCiento.replace(/\D/g, '')) || 0,
@@ -172,7 +221,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={equipo}
-                onChange={(e) => setEquipo(e.target.value)}
+                onChange={(e) => setEquipo(e.target.value.toUpperCase())}
                 required
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="iPhone"
@@ -187,7 +236,7 @@ export default function IngresosModule() {
                 type="text"
                 value={modelo}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                  const value = e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
                   setModelo(value);
                 }}
                 required
@@ -203,7 +252,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={color}
-                onChange={(e) => setColor(e.target.value)}
+                onChange={(e) => setColor(e.target.value.toUpperCase())}
                 required
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="Titanio Natural"
@@ -215,7 +264,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={subModelo}
-                onChange={(e) => setSubModelo(e.target.value)}
+                onChange={(e) => setSubModelo(e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="pro"
               />
@@ -228,7 +277,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={serie}
-                onChange={(e) => setSerie(e.target.value)}
+                onChange={(e) => setSerie(e.target.value.toUpperCase())}
                 required
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="15"
@@ -294,15 +343,14 @@ export default function IngresosModule() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
-                9. SKU <span className="text-red-500">*</span>
+                9. SKU (Generado automáticamente)
               </label>
               <input
                 type="text"
                 value={sku}
-                onChange={(e) => setSku(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-                placeholder="IPH15-MA-DE256OP01788"
+                readOnly
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#0ea5e9] rounded-lg text-white font-semibold focus:outline-none"
+                placeholder="IPH12-BA-BL64SE"
               />
             </div>
 
@@ -351,7 +399,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={proveedor}
-                onChange={(e) => setProveedor(e.target.value)}
+                onChange={(e) => setProveedor(e.target.value.toUpperCase())}
                 required
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="Nombre del Proveedor"
@@ -382,7 +430,7 @@ export default function IngresosModule() {
               <label className="block text-sm font-medium text-slate-400 mb-2">14. OBSERVACIÓN</label>
               <textarea
                 value={observacion}
-                onChange={(e) => setObservacion(e.target.value)}
+                onChange={(e) => setObservacion(e.target.value.toUpperCase())}
                 rows={3}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
               />
@@ -392,7 +440,7 @@ export default function IngresosModule() {
               <label className="block text-sm font-medium text-slate-400 mb-2">15. FALLA CON LA QUE VINO DE MAC ONLINE</label>
               <textarea
                 value={fallaMacOnline}
-                onChange={(e) => setFallaMacOnline(e.target.value)}
+                onChange={(e) => setFallaMacOnline(e.target.value.toUpperCase())}
                 rows={3}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
               />
@@ -402,7 +450,7 @@ export default function IngresosModule() {
               <label className="block text-sm font-medium text-slate-400 mb-2">16. GARANTÍA COMPRA</label>
               <textarea
                 value={garantiaCompra}
-                onChange={(e) => setGarantiaCompra(e.target.value)}
+                onChange={(e) => setGarantiaCompra(e.target.value.toUpperCase())}
                 rows={3}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
               />
@@ -418,8 +466,8 @@ export default function IngresosModule() {
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">17. BLOCK</label>
               <select
-               value={condicion}
-                onChange={(e) => setCondicion(e.target.value)}
+                value={block}
+                onChange={(e) => setBlock(e.target.value)}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
               >
                 <option value="">Seleccionar...</option>
@@ -431,8 +479,8 @@ export default function IngresosModule() {
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">18. DATOS EQUIPOS</label>
               <select
-                value={condicion}
-                onChange={(e) => setCondicion(e.target.value)}
+                value={datosEquipos}
+                onChange={(e) => setDatosEquipos(e.target.value)}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
               >
                 <option value="">Seleccionar...</option>
@@ -446,7 +494,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={numeroSerie}
-                onChange={(e) => setNumeroSerie(e.target.value)}
+                onChange={(e) => setNumeroSerie(e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="353084064746173"
               />
@@ -457,7 +505,7 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={imei1}
-                onChange={(e) => setImei1(e.target.value)}
+                onChange={(e) => setImei1(e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="353084064746173"
               />
@@ -468,19 +516,19 @@ export default function IngresosModule() {
               <input
                 type="text"
                 value={imei2}
-                onChange={(e) => setImei2(e.target.value)}
+                onChange={(e) => setImei2(e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="353084064746174"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">30. CONCATENACIÓN (Automático)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">22. CONCATENACIÓN (Automático)</label>
               <input
                 type="text"
                 value={concatenacion}
                 readOnly
-                className="w-full px-4 py-3 bg-[#0f172a] placeholder-[gray] border border-[#0ea5e9] rounded-lg text-[#0ea5e9] font-semibold"
+                className="w-full px-4 py-3 bg-[#0f172a] placeholder-[gray] border border-[#0ea5e9] rounded-lg text-white font-semibold"
                 placeholder="IMEI 1 ; IMEI 2"
               />
             </div>
@@ -493,7 +541,7 @@ export default function IngresosModule() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="lg:col-span-1">
-              <label className="block text-sm font-medium text-slate-400 mb-2">22. ESTADO</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">23. ESTADO</label>
               <select
                 value={condicion}
                 onChange={(e) => setCondicion(e.target.value)}
@@ -508,7 +556,7 @@ export default function IngresosModule() {
             </div>
 
             <div className="lg:col-span-1">
-              <label className="block text-sm font-medium text-slate-400 mb-2">23. FECHA</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">24. FECHA</label>
               <input
                 type="date"
                 value={fecha}
@@ -519,7 +567,7 @@ export default function IngresosModule() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-3">24. MÉTODO DE PAGO</label>
+            <label className="block text-sm font-medium text-slate-400 mb-3">25. MÉTODO DE PAGO</label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {['TRANSFERENCIA', 'CREDITO', 'EFECTIVO', 'PERMUTA', 'EQUIPO BLOCK'].map((metodo) => (
                 <label key={metodo} className="flex items-center gap-2 cursor-pointer">
@@ -542,7 +590,7 @@ export default function IngresosModule() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">25. REPUESTO (CLP)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">26. REPUESTO (CLP)</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
                   $
@@ -557,7 +605,7 @@ export default function IngresosModule() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">26. PVP EFECTIVO (CLP)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">27. PVP EFECTIVO (CLP)</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
                   $
@@ -572,7 +620,22 @@ export default function IngresosModule() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">27. UTILIDAD (CLP)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">28. PVP CRÉDITO (CLP)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
+                  $
+                </span>
+                <input
+                  type="text"
+                  value={pvpCredito}
+                  onChange={(e) => setPvpCredito(formatoPesosChilenos(e.target.value))}
+                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">29. UTILIDAD (CLP) <span className="text-xs text-blue-400">(Auto)</span></label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
                   $
@@ -580,14 +643,14 @@ export default function IngresosModule() {
                 <input
                   type="text"
                   value={utilidad}
-                  onChange={(e) => setUtilidad(formatoPesosChilenos(e.target.value))}
-                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                  readOnly
+                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border-2 border-[#0ea5e9] rounded-lg text-white cursor-not-allowed"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">28. UTILIDAD2 (CLP)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">30. UTILIDAD2 (CLP) <span className="text-xs text-blue-400">(Auto)</span></label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
                   $
@@ -595,14 +658,14 @@ export default function IngresosModule() {
                 <input
                   type="text"
                   value={utilidad2}
-                  onChange={(e) => setUtilidad2(formatoPesosChilenos(e.target.value))}
-                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                  readOnly
+                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border-2 border-[#0ea5e9] rounded-lg text-white cursor-not-allowed"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">29. 3,2% (CLP)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">31. 3,2% (CLP)</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
                   $

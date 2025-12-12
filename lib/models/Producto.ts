@@ -35,6 +35,7 @@ export interface Producto {
   // Sección 6 - Precios
   repuesto: number;
   pvpEfectivo: number;
+  pvpCredito: number;
   utilidad: number;
   utilidad2: number;
   tresPorCiento: number;
