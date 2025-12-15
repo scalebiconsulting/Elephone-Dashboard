@@ -5,3 +5,4 @@ export { default as Observaciones } from './Observaciones';
 export { default as EstadoEquipo } from './EstadoEquipo';
 export { default as Inventario } from './Inventario';
 export { default as PreciosUtilidad } from './PreciosUtilidad';
+export { default as BasaleExport } from './BasaleExport';

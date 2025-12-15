@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Edit, Trash2, ShoppingBag } from 'lucide-react';
+import { Eye, Edit, Trash2 } from 'lucide-react';
 import { ProductoInventario } from '@/app/types/producto';
 import { formatCLP } from '@/app/utils/formatters';
 
@@ -9,6 +9,7 @@ interface TablaInventarioProps {
   totalProductos: number;
   loading: boolean;
   onDelete: (id: string) => void;
+  onEdit: (producto: ProductoInventario) => void;
   onSelectForSale?: (producto: ProductoInventario) => void;
 }
 
@@ -17,6 +18,7 @@ export default function TablaInventario({
   totalProductos,
   loading,
   onDelete,
+  onEdit,
   onSelectForSale
 }: TablaInventarioProps) {
   return (
@@ -56,7 +58,19 @@ export default function TablaInventario({
               </tr>
             ) : (
               productos.map((producto) => (
-                <tr key={producto._id} className="hover:bg-[#0f172a]/50 transition-colors">
+                <tr 
+                  key={producto._id} 
+                  className={`hover:bg-[#0f172a]/50 transition-colors ${
+                    producto.estado === 'STOCK OFICINA' && onSelectForSale 
+                      ? 'cursor-pointer' 
+                      : ''
+                  }`}
+                  onClick={() => {
+                    if (producto.estado === 'STOCK OFICINA' && onSelectForSale) {
+                      onSelectForSale(producto);
+                    }
+                  }}
+                >
                   <td className="px-4 py-3 text-sm text-white font-mono">{producto.sku || '-'}</td>
                   <td className="px-4 py-3 text-sm text-white max-w-[200px] truncate" title={producto.modelo2}>
                     {producto.modelo2 || '-'}
@@ -107,7 +121,7 @@ export default function TablaInventario({
                     {producto.imei1 || '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-300 font-mono">{producto.numeroSerie || '-'}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-center gap-1">
                       <button
                         onClick={() => alert(`Ver detalles de ${producto.sku}`)}
@@ -117,7 +131,7 @@ export default function TablaInventario({
                         <Eye size={16} />
                       </button>
                       <button
-                        onClick={() => alert(`Editar ${producto.sku}`)}
+                        onClick={() => onEdit(producto)}
                         className="p-2 text-slate-400 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors"
                         title="Editar"
                       >
@@ -130,15 +144,6 @@ export default function TablaInventario({
                       >
                         <Trash2 size={16} />
                       </button>
-                      {producto.estado === 'STOCK OFICINA' && onSelectForSale && (
-                        <button
-                          onClick={() => onSelectForSale(producto)}
-                          className="p-2 text-slate-400 hover:text-green-400 hover:bg-green-400/10 rounded-lg transition-colors"
-                          title="Seleccionar para venta"
-                        >
-                          <ShoppingBag size={16} />
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>

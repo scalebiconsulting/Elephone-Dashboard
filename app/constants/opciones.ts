@@ -38,7 +38,7 @@ export const METODOS_PAGO = [
 
 // Valores por defecto del formulario
 export const VALORES_INICIALES = {
-  estado: 'STOCK OFICINA',
+  estado: '',
   block: 'NO',
   datosEquipos: 'NO DATOS',
 } as const;

@@ -8,7 +8,8 @@ import {
   Observaciones,
   EstadoEquipo,
   Inventario,
-  PreciosUtilidad
+  PreciosUtilidad,
+  BasaleExport
 } from '@/app/components/forms/ingresos';
 
 export default function IngresosModule() {
@@ -109,6 +110,13 @@ export default function IngresosModule() {
           setPvpEfectivo={form.setPvpEfectivo}
           setPvpCredito={form.setPvpCredito}
           setTresPorCiento={form.setTresPorCiento}
+        />
+
+        {/* Sección 7 - Exportar a Basale */}
+        <BasaleExport
+          sku={form.sku}
+          costo={form.costo}
+          concatenacion={form.concatenacion}
         />
 
         {/* Botón Submit */}

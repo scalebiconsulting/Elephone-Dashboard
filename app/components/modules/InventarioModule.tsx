@@ -2,8 +2,10 @@
 
 import { Package, Search, RefreshCw } from 'lucide-react';
 import { useInventario } from '@/app/hooks/useInventario';
+import { useEditarProducto } from '@/app/hooks/useEditarProducto';
 import { formatCLP } from '@/app/utils/formatters';
 import TablaInventario from '@/app/components/tables/TablaInventario';
+import EditarProductoModal from '@/app/components/modals/EditarProductoModal';
 import { ProductoInventario } from '@/app/types/producto';
 
 interface InventarioModuleProps {
@@ -32,6 +34,9 @@ export default function InventarioModule({ onSelectForSale, onChangeModule }: In
     fetchProductos,
     handleDelete,
   } = useInventario();
+
+  // Hook para editar productos
+  const editarProducto = useEditarProducto(fetchProductos);
 
   // Seleccionar para venta
   const handleSelectForSale = (producto: ProductoInventario) => {
@@ -146,7 +151,21 @@ export default function InventarioModule({ onSelectForSale, onChangeModule }: In
         totalProductos={productos.length}
         loading={loading}
         onDelete={handleDelete}
-        onSelectForSale={onSelectForSale ? handleSelectForSale : undefined}
+        onEdit={editarProducto.openModal}
+        onSelectForSale={(onSelectForSale || onChangeModule) ? handleSelectForSale : undefined}
+      />
+
+      {/* Modal de Edición */}
+      <EditarProductoModal
+        isOpen={editarProducto.isOpen}
+        producto={editarProducto.producto}
+        campos={editarProducto.campos}
+        utilidad={editarProducto.utilidad}
+        utilidad2={editarProducto.utilidad2}
+        loading={editarProducto.loading}
+        onClose={editarProducto.closeModal}
+        onCampoChange={editarProducto.setCampo}
+        onGuardar={editarProducto.guardarCambios}
       />
     </div>
   );
