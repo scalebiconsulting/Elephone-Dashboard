@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import IngresosModule from './components/modules/IngresosModule';
 import InventarioModule from './components/modules/InventarioModule';
 import PuntoVentaModule from './components/modules/PuntoVentaModule';
+import PermutaModule from './components/modules/PermutaModule';
 import { ProductoInventario } from './types/producto';
 
 export default function Home() {
@@ -47,12 +48,7 @@ export default function Home() {
           />
         )}
         
-        {activeModule === 'permutas' && (
-          <div className="text-white">
-            <h1 className="text-3xl font-bold mb-4">Permutas</h1>
-            <p className="text-slate-400">Módulo en construcción</p>
-          </div>
-        )}
+        {activeModule === 'permutas' && <PermutaModule />}
       </main>
     </div>
   );

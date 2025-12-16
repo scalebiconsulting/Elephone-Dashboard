@@ -168,3 +168,34 @@ export interface Venta {
   producto: ProductoInventario;
   createdAt?: Date;
 }
+
+// Interface para permutas
+export interface Permuta {
+  _id?: string;
+  // Producto que sale (se vende)
+  productoVendidoId: string;
+  productoVendidoSku: string;
+  productoVendidoModelo: string;
+  precioVenta: number;
+  // Producto que entra (permuta del cliente)
+  productoPermutaId?: string;
+  productoPermutaSku: string;
+  productoPermutaModelo: string;
+  valorPermuta: number;
+  // Cálculos
+  diferencia: number; // positivo = cliente paga, negativo = negocio devuelve
+  tipoTransaccion: 'CLIENTE_PAGA' | 'NEGOCIO_DEVUELVE' | 'EMPATE';
+  // Pago/Devolución
+  montoEfectivo: number;
+  montoTransferencia: number;
+  montoDebito: number;
+  // Cliente
+  nombreCliente: string;
+  correoCliente: string;
+  telefonoCliente: string;
+  // Metadata
+  fechaPermuta: string;
+  estadoPermuta: string;
+  utilidad: number;
+  createdAt?: Date;
+}
