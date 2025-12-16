@@ -101,7 +101,7 @@ export default function TablaInventario({
                   <td className="px-4 py-3 text-sm text-center">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       producto.estado === 'STOCK OFICINA' ? 'text-[#0ea5e9]' :
-                      producto.estado === 'VENDIDO' ? 'text-purple-400' :
+                      producto.estado === 'VENDIDO' ? 'text-red-500' :
                       'text-slate-400'
                     }`}>
                       {producto.estado || '-'}

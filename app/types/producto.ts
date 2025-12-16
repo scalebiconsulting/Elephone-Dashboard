@@ -150,3 +150,21 @@ export interface ProductoData {
   utilidad2: number;
   tresPorCiento: number;
 }
+
+// Interface para ventas
+export interface Venta {
+  _id?: string;
+  productoId: string;
+  sku: string;
+  modelo2: string;
+  nombreCliente: string;
+  correoCliente: string;
+  telefonoCliente: string;
+  metodoPago: 'EFECTIVO' | 'CREDITO';
+  precioVenta: number;
+  utilidad: number;
+  fechaVenta: string;
+  estadoVenta: string;
+  producto: ProductoInventario;
+  createdAt?: Date;
+}
