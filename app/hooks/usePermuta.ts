@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ProductoInventario, Permuta } from '@/app/types/producto';
 import { extraerNumero, formatoPesosChilenos } from '@/app/utils/formatters';
-import { generarSKU, generarCorrelativo } from '@/app/utils/generators';
+import { generarSKU, generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
+import { toast } from '@/app/components/ui/Toast';
 
 export function usePermuta() {
   // Estado del producto que entra (permuta del cliente)
@@ -70,11 +71,9 @@ export function usePermuta() {
 
   // Auto-generar modelo2
   useEffect(() => {
-    const modelo2 = equipoVal && serieVal && gbVal && colorVal && condicionVal
-      ? `${equipoVal} ${serieVal} ${gbVal} GB ${colorVal} ${condicionVal}`.toUpperCase()
-      : '';
+    const modelo2 = generarModelo2(equipoVal, serieVal, productoPermuta.modelo, gbVal, colorVal, condicionVal);
     setProductoPermuta(prev => prev.modelo2 !== modelo2 ? { ...prev, modelo2 } : prev);
-  }, [equipoVal, serieVal, gbVal, colorVal, condicionVal]);
+  }, [equipoVal, serieVal, productoPermuta.modelo, gbVal, colorVal, condicionVal]);
 
   // Auto-generar SKU
   useEffect(() => {
@@ -90,7 +89,7 @@ export function usePermuta() {
 
   // Auto-generar concatenación
   useEffect(() => {
-    const concatenacion = [imei1Val, imei2Val].filter(Boolean).join(';');
+    const concatenacion = generarConcatenacion(imei1Val, imei2Val);
     setProductoPermuta(prev => prev.concatenacion !== concatenacion ? { ...prev, concatenacion } : prev);
   }, [imei1Val, imei2Val]);
 
@@ -205,28 +204,28 @@ export function usePermuta() {
   const registrarPermuta = async () => {
     // Validaciones
     if (!productoVenta) {
-      alert('Debe buscar y seleccionar un producto a vender');
+      toast.warning('Debe buscar y seleccionar un producto a vender');
       return false;
     }
 
     if (!productoPermuta.equipo || !productoPermuta.serie || !productoPermuta.condicion) {
-      alert('Complete los campos obligatorios del producto en permuta');
+      toast.warning('Complete los campos obligatorios del producto en permuta');
       return false;
     }
 
     if (!productoPermuta.valorPermuta || extraerNumero(productoPermuta.valorPermuta) <= 0) {
-      alert('Ingrese el valor de permuta');
+      toast.warning('Ingrese el valor de permuta');
       return false;
     }
 
     if (!nombreCliente.trim() || nombreCliente.length < 3) {
-      alert('El nombre del cliente debe tener al menos 3 caracteres');
+      toast.warning('El nombre del cliente debe tener al menos 3 caracteres');
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!correoCliente.trim() || !emailRegex.test(correoCliente)) {
-      alert('Ingrese un correo electrónico válido');
+      toast.warning('Ingrese un correo electrónico válido');
       return false;
     }
 
@@ -237,7 +236,7 @@ export function usePermuta() {
     if (tipoTransaccion !== 'EMPATE') {
       const saldoPendiente = calcularSaldoPendiente();
       if (saldoPendiente > 0) {
-        alert(`Falta cubrir ${saldoPendiente.toLocaleString('es-CL')} de la ${tipoTransaccion === 'CLIENTE_PAGA' ? 'diferencia' : 'devolución'}`);
+        toast.warning(`Falta cubrir ${saldoPendiente.toLocaleString('es-CL')} de la ${tipoTransaccion === 'CLIENTE_PAGA' ? 'diferencia' : 'devolución'}`);
         return false;
       }
     }
@@ -341,7 +340,7 @@ export function usePermuta() {
       });
 
       if (responsePermuta.ok) {
-        alert('¡Permuta registrada exitosamente!');
+        toast.success('¡Permuta registrada exitosamente!');
         resetFormulario();
         fetchPermutas();
         return true;
@@ -350,7 +349,7 @@ export function usePermuta() {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al registrar la permuta');
+      toast.error('Error al registrar la permuta');
       return false;
     } finally {
       setLoading(false);

@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ProductoInventario } from '@/app/types/producto';
 import { formatoPesosChilenos, extraerNumero, calcularUtilidad } from '@/app/utils/formatters';
+import { toast } from '@/app/components/ui/Toast';
 
 export interface ProductoEditableFields {
   estado: string;
@@ -146,12 +147,12 @@ export function useEditarProducto(onProductoActualizado?: () => void): UseEditar
         }
         return true;
       } else {
-        alert('❌ Error al actualizar: ' + data.error);
+        toast.error('Error al actualizar: ' + data.error);
         return false;
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('❌ Error de conexión');
+      toast.error('Error de conexión');
       return false;
     } finally {
       setLoading(false);

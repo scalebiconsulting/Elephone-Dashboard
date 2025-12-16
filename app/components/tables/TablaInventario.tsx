@@ -124,7 +124,7 @@ export default function TablaInventario({
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-center gap-1">
                       <button
-                        onClick={() => alert(`Ver detalles de ${producto.sku}`)}
+                        onClick={() => onEdit(producto)}
                         className="p-2 text-slate-400 hover:text-[#0ea5e9] hover:bg-[#0ea5e9]/10 rounded-lg transition-colors"
                         title="Ver detalles"
                       >

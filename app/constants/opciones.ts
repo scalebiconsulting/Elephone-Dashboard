@@ -36,6 +36,19 @@ export const METODOS_PAGO = [
   'EQUIPO BLOCK',
 ] as const;
 
+export const ESTADOS_VENTA = [
+  'PENDIENTE',
+  'PAGADO',
+  'ENTREGADO',
+  'ANULADO',
+] as const;
+
+export const ESTADOS_PERMUTA = [
+  'PENDIENTE',
+  'COMPLETADA',
+  'ANULADA',
+] as const;
+
 // Valores por defecto del formulario
 export const VALORES_INICIALES = {
   estado: '',

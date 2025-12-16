@@ -1,8 +1,8 @@
 "use client";
 
 import { formatCLP } from '@/app/utils/formatters';
-
-const ESTADOS_VENTA = ['PENDIENTE', 'PAGADO', 'ENTREGADO', 'ANULADO'];
+import { ESTADOS_VENTA } from '@/app/constants/opciones';
+import { FormasPagoGrid } from '@/app/components/forms/shared';
 
 interface ResumenVentaProps {
   precioVenta: number;
@@ -83,47 +83,14 @@ export default function ResumenVenta({
             <label className="block text-sm font-medium text-slate-300 mb-2">
               Forma de Pago
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Efectivo</label>
-                <div className="relative">
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
-                  <input
-                    type="text"
-                    value={montoEfectivo}
-                    onChange={(e) => setMontoEfectivo(e.target.value)}
-                    className="w-full pl-5 pr-2 py-2 bg-[#0f172a] border border-[#334155] rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-[#0ea5e9] text-sm"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Transferencia</label>
-                <div className="relative">
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
-                  <input
-                    type="text"
-                    value={montoTransferencia}
-                    onChange={(e) => setMontoTransferencia(e.target.value)}
-                    className="w-full pl-5 pr-2 py-2 bg-[#0f172a] border border-[#334155] rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-[#0ea5e9] text-sm"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Débito</label>
-                <div className="relative">
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
-                  <input
-                    type="text"
-                    value={montoDebito}
-                    onChange={(e) => setMontoDebito(e.target.value)}
-                    className="w-full pl-5 pr-2 py-2 bg-[#0f172a] border border-[#334155] rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-[#0ea5e9] text-sm"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-            </div>
+            <FormasPagoGrid
+              montoEfectivo={montoEfectivo}
+              setMontoEfectivo={setMontoEfectivo}
+              montoTransferencia={montoTransferencia}
+              setMontoTransferencia={setMontoTransferencia}
+              montoDebito={montoDebito}
+              setMontoDebito={setMontoDebito}
+            />
           </div>
         )}
 

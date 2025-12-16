@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ProductoInventario, Venta } from '@/app/types/producto';
 import { extraerNumero, formatoPesosChilenos } from '@/app/utils/formatters';
+import { toast } from '@/app/components/ui/Toast';
 
 export function usePuntoVenta(productoInicial: ProductoInventario | null) {
   const [producto, setProducto] = useState<ProductoInventario | null>(productoInicial);
@@ -88,19 +89,19 @@ export function usePuntoVenta(productoInicial: ProductoInventario | null) {
 
     // Validaciones
     if (!nombreCliente.trim() || nombreCliente.length < 3) {
-      alert('El nombre del cliente debe tener al menos 3 caracteres');
+      toast.warning('El nombre del cliente debe tener al menos 3 caracteres');
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!correoCliente.trim() || !emailRegex.test(correoCliente)) {
-      alert('Ingrese un correo electrónico válido');
+      toast.warning('Ingrese un correo electrónico válido');
       return false;
     }
 
     const telefonoRegex = /^(\+?56)?[9]\d{8}$/;
     if (!telefonoCliente.trim() || !telefonoRegex.test(telefonoCliente.replace(/\s/g, ''))) {
-      alert('Ingrese un teléfono válido (formato chileno: +56 9...)');
+      toast.warning('Ingrese un teléfono válido (formato chileno: +56 9...)');
       return false;
     }
 
@@ -108,7 +109,7 @@ export function usePuntoVenta(productoInicial: ProductoInventario | null) {
     if (modalidadPago === 'CONTADO') {
       const saldoPendiente = calcularSaldoPendiente();
       if (saldoPendiente > 0) {
-        alert(`Falta cubrir ${saldoPendiente.toLocaleString('es-CL')} del total`);
+        toast.warning(`Falta cubrir ${saldoPendiente.toLocaleString('es-CL')} del total`);
         return false;
       }
     }
@@ -165,18 +166,18 @@ export function usePuntoVenta(productoInicial: ProductoInventario | null) {
           body: JSON.stringify({ estado: 'VENDIDO' }),
         });
 
-        alert('¡Venta registrada exitosamente!');
+        toast.success('¡Venta registrada exitosamente!');
         setProducto(null);
         resetFormulario();
         fetchVentas();
         return true;
       } else {
-        alert('Error al registrar la venta');
+        toast.error('Error al registrar la venta');
         return false;
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al registrar la venta');
+      toast.error('Error al registrar la venta');
       return false;
     } finally {
       setLoading(false);

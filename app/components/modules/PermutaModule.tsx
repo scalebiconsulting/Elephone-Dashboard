@@ -4,7 +4,7 @@ import { usePermuta } from '@/app/hooks/usePermuta';
 import { extraerNumero } from '@/app/utils/formatters';
 import FormularioProductoPermuta from '@/app/components/forms/permuta/FormularioProductoPermuta';
 import BuscadorProductoVenta from '@/app/components/forms/permuta/BuscadorProductoVenta';
-import DatosClientePermuta from '@/app/components/forms/permuta/DatosClientePermuta';
+import DatosCliente from '@/app/components/forms/pos/DatosCliente';
 import ResumenPermuta from '@/app/components/forms/permuta/ResumenPermuta';
 import HistorialPermutas from '@/app/components/forms/permuta/HistorialPermutas';
 import { ArrowLeftRight } from 'lucide-react';
@@ -79,7 +79,7 @@ export default function PermutaModule() {
 
       {/* Fila 3: Datos Cliente | Resumen Permuta */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DatosClientePermuta
+        <DatosCliente
           nombreCliente={nombreCliente}
           setNombreCliente={setNombreCliente}
           correoCliente={correoCliente}
