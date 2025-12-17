@@ -1,4 +1,5 @@
 // Tipos para el formulario de productos
+import type { ProveedorData } from '@/lib/models/Producto';
 
 // Interface para Persona (unifica Cliente y Proveedor)
 export interface Persona {
@@ -13,14 +14,7 @@ export interface Persona {
   updatedAt?: Date;
 }
 
-// Interface para datos del proveedor (legacy - usar Persona)
-export interface Proveedor {
-  nombre: string;
-  correo: string;
-  telefono: string;
-  direccion: string;
-  documentos: string[]; // base64 strings
-}
+// Para datos de proveedor en productos, usar ProveedorData del modelo
 
 // Interface para producto del inventario (desde BD)
 export interface ProductoInventario {
@@ -46,7 +40,7 @@ export interface ProductoInventario {
   numeroSerie: string;
   imei1: string;
   imei2: string;
-  proveedor: Proveedor;
+  proveedor: ProveedorData;
   observacion?: string;
   fallaMacOnline?: string;
   garantiaCompra?: string;
@@ -234,7 +228,7 @@ export interface Reserva {
   condicion: string;
   precioAcordado: number;
   // Origen
-  proveedor: Proveedor;
+  proveedor: ProveedorData;
   fechaEstimadaLlegada: string;
   // Cliente
   nombreCliente: string;

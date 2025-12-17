@@ -53,22 +53,4 @@ export interface Producto {
   updatedAt?: Date;
 }
 
-export interface FormCompra {
-  skuBase: string;
-  bateria: string;
-  costo: string;
-  precioEfectivo: string;
-  precioCredito: string;
-  ubicacion: string;
-  imei: string;
-  proveedor: string;
-}
-
-export interface MatrizProducto {
-  codigo: string;
-  categoria: string;
-  modelo: string;
-  color: string;
-  gb: string;
-  condicion: 'NUEVO' | 'OPENBOX' | 'SEMINUEVO';
-}
+// Interfaces FormCompra y MatrizProducto eliminadas - no se usaban
