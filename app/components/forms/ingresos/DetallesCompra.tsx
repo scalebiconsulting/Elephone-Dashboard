@@ -1,5 +1,7 @@
 "use client";
 
+import DateInput from '@/app/components/forms/shared/DateInput';
+
 interface DetallesCompraProps {
   sku: string;
   condicionBateria: string;
@@ -86,15 +88,11 @@ export default function DetallesCompra({
         </div>
 
         <div className="lg:col-span-1">
-          <label className="block text-sm font-medium text-slate-400 mb-2">
-            13. FECHA DE COMPRA <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
+          <DateInput
+            label="13. FECHA DE COMPRA"
             value={fechaCompra}
-            onChange={(e) => setFechaCompra(e.target.value)}
+            onChange={setFechaCompra}
             required
-            className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9] [color-scheme:dark]"
           />
         </div>
       </div>

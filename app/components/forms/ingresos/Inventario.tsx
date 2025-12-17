@@ -1,6 +1,7 @@
 "use client";
 
 import { ESTADOS_INVENTARIO, METODOS_PAGO } from '@/app/constants/opciones';
+import DateInput from '@/app/components/forms/shared/DateInput';
 
 interface InventarioProps {
   estado: string;
@@ -34,12 +35,10 @@ export default function Inventario({
         </div>
 
         <div className="lg:col-span-1">
-          <label className="block text-sm font-medium text-slate-400 mb-2">24. FECHA</label>
-          <input
-            type="date"
+          <DateInput
+            label="24. FECHA"
             value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9] [color-scheme:dark]"
+            onChange={setFecha}
           />
         </div>
       </div>

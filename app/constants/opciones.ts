@@ -49,6 +49,13 @@ export const ESTADOS_PERMUTA = [
   'ANULADA',
 ] as const;
 
+export const ESTADOS_RESERVA = [
+  { value: 'PENDIENTE', label: 'Pendiente', color: 'bg-yellow-500' },
+  { value: 'PRODUCTO_DISPONIBLE', label: 'Producto Disponible', color: 'bg-green-500' },
+  { value: 'COMPLETADA', label: 'Completada', color: 'bg-blue-500' },
+  { value: 'CANCELADA', label: 'Cancelada', color: 'bg-red-500' },
+] as const;
+
 // Valores por defecto del formulario
 export const VALORES_INICIALES = {
   estado: '',

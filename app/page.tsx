@@ -6,6 +6,7 @@ import IngresosModule from './components/modules/IngresosModule';
 import InventarioModule from './components/modules/InventarioModule';
 import PuntoVentaModule from './components/modules/PuntoVentaModule';
 import PermutaModule from './components/modules/PermutaModule';
+import ReservasModule from './components/modules/ReservasModule';
 import { ProductoInventario } from './types/producto';
 
 export default function Home() {
@@ -49,6 +50,8 @@ export default function Home() {
         )}
         
         {activeModule === 'permutas' && <PermutaModule />}
+        
+        {activeModule === 'reservas' && <ReservasModule />}
       </main>
     </div>
   );

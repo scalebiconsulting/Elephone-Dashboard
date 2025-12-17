@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, ShoppingCart, ShoppingBag, Package, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, ShoppingBag, Package, RefreshCw, CalendarClock } from 'lucide-react';
 
 interface SidebarProps {
   activeModule: string;
@@ -14,6 +14,7 @@ export default function Sidebar({ activeModule, onChangeModule }: SidebarProps) 
     { id: 'pos', label: 'Punto de Venta', icon: ShoppingBag },
     { id: 'inventario', label: 'Inventario', icon: Package },
     { id: 'permutas', label: 'Permutas', icon: RefreshCw },
+    { id: 'reservas', label: 'Reservas', icon: CalendarClock },
   ];
 
   return (

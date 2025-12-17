@@ -199,3 +199,35 @@ export interface Permuta {
   utilidad: number;
   createdAt?: Date;
 }
+
+// Interface para Reserva de producto
+export interface Reserva {
+  _id: string;
+  // Producto esperado
+  equipo: string;
+  modelo: string;
+  color: string;
+  gb: string;
+  condicion: string;
+  precioAcordado: number;
+  // Origen
+  proveedor: string;
+  fechaEstimadaLlegada: string;
+  // Cliente
+  nombreCliente: string;
+  correoCliente: string;
+  telefonoCliente: string;
+  // Abono/Seña
+  montoSenaEfectivo: number;
+  montoSenaTransferencia: number;
+  montoSenaDebito: number;
+  // Estado
+  estadoReserva: 'PENDIENTE' | 'PRODUCTO_DISPONIBLE' | 'COMPLETADA' | 'CANCELADA';
+  productoId?: string;
+  // Metadata
+  observaciones: string;
+  fechaCreacion: string;
+  fechaActualizacion: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

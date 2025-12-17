@@ -4,6 +4,7 @@ import { Package } from 'lucide-react';
 import { CONDICIONES_PRODUCTO, OPCIONES_BLOCK, OPCIONES_DATOS_EQUIPOS, ESTADOS_INVENTARIO } from '@/app/constants/opciones';
 import { formatoPesosChilenos } from '@/app/utils/formatters';
 import BasaleExport from '@/app/components/forms/ingresos/BasaleExport';
+import DateInput from '@/app/components/forms/shared/DateInput';
 
 interface FormularioProductoPermutaProps {
   productoPermuta: {
@@ -224,15 +225,11 @@ export default function FormularioProductoPermuta({
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">FECHA COMPRA</label>
-              <input
-                type="date"
-                value={productoPermuta.fechaCompra}
-                onChange={(e) => updateProductoPermuta('fechaCompra', e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-              />
-            </div>
+            <DateInput
+              label="FECHA COMPRA"
+              value={productoPermuta.fechaCompra}
+              onChange={(value) => updateProductoPermuta('fechaCompra', value)}
+            />
           </div>
         </div>
 
