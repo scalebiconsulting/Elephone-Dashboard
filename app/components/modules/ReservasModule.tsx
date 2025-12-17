@@ -1,20 +1,25 @@
 "use client";
 
 import { useReservas } from '@/app/hooks/useReservas';
-import { CalendarClock, Plus, Package, User, DollarSign } from 'lucide-react';
+import { CalendarClock, Plus, Package, DollarSign } from 'lucide-react';
 import { CONDICIONES_PRODUCTO, ESTADOS_RESERVA } from '@/app/constants/opciones';
 import { formatCLP } from '@/app/utils/formatters';
 import DateInput from '@/app/components/forms/shared/DateInput';
+import SelectorPersona from '@/app/components/forms/shared/SelectorPersona';
 
 export default function ReservasModule() {
   const {
     reservas,
     loading,
     formulario,
+    proveedor,
+    cliente,
     editandoId,
     contadores,
     updateFormulario,
     handleMoneyChange,
+    setProveedor,
+    setCliente,
     resetFormulario,
     crearReserva,
     actualizarReserva,
@@ -130,23 +135,35 @@ export default function ReservasModule() {
           </div>
         </div>
 
-        {/* Sección Origen y Precio */}
+        {/* Sección Proveedor */}
+        <div className="mb-6">
+          <SelectorPersona
+            persona={proveedor}
+            onPersonaChange={setProveedor}
+            roles={['PROVEEDOR']}
+            titulo="Datos del Proveedor (Origen del Producto)"
+            showDocumentos={false}
+          />
+        </div>
+
+        {/* Sección Cliente */}
+        <div className="mb-6">
+          <SelectorPersona
+            persona={cliente}
+            onPersonaChange={setCliente}
+            roles={['CLIENTE']}
+            titulo="Datos del Cliente (Quien Reserva)"
+            showDocumentos={false}
+          />
+        </div>
+
+        {/* Sección Precio y Fecha */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-white mb-4 border-b border-[#334155] pb-2 flex items-center gap-2">
             <DollarSign size={18} className="text-slate-400" />
-            Origen y Precio
+            Precio y Fecha Estimada
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">PROVEEDOR</label>
-              <input
-                type="text"
-                value={formulario.proveedor}
-                onChange={(e) => updateFormulario('proveedor', e.target.value.toUpperCase())}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-                placeholder="Nombre proveedor"
-              />
-            </div>
             <DateInput
               label="FECHA ESTIMADA LLEGADA"
               value={formulario.fechaEstimadaLlegada}
@@ -209,50 +226,6 @@ export default function ReservasModule() {
                   />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sección Cliente */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-white mb-4 border-b border-[#334155] pb-2 flex items-center gap-2">
-            <User size={18} className="text-slate-400" />
-            Datos del Cliente
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                NOMBRE <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formulario.nombreCliente}
-                onChange={(e) => updateFormulario('nombreCliente', e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-                placeholder="Nombre completo"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">CORREO</label>
-              <input
-                type="email"
-                value={formulario.correoCliente}
-                onChange={(e) => updateFormulario('correoCliente', e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-                placeholder="correo@ejemplo.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                TELÉFONO <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                value={formulario.telefonoCliente}
-                onChange={(e) => updateFormulario('telefonoCliente', e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-                placeholder="+56 9 1234 5678"
-              />
             </div>
           </div>
         </div>

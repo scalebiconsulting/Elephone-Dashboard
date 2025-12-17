@@ -1,5 +1,27 @@
 // Tipos para el formulario de productos
 
+// Interface para Persona (unifica Cliente y Proveedor)
+export interface Persona {
+  _id?: string;
+  nombre: string;
+  correo: string;
+  telefono: string;
+  direccion: string;
+  documentos: string[]; // base64 strings
+  roles: ('CLIENTE' | 'PROVEEDOR')[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// Interface para datos del proveedor (legacy - usar Persona)
+export interface Proveedor {
+  nombre: string;
+  correo: string;
+  telefono: string;
+  direccion: string;
+  documentos: string[]; // base64 strings
+}
+
 // Interface para producto del inventario (desde BD)
 export interface ProductoInventario {
   _id: string;
@@ -24,7 +46,7 @@ export interface ProductoInventario {
   numeroSerie: string;
   imei1: string;
   imei2: string;
-  proveedor: string;
+  proveedor: Proveedor;
   observacion?: string;
   fallaMacOnline?: string;
   garantiaCompra?: string;
@@ -54,7 +76,7 @@ export interface ProductoFormState {
   sku: string;
   condicionBateria: string;
   costo: string;
-  proveedor: string;
+  persona: Persona | null;
   fechaCompra: string;
 
   // Sección 3 - Observaciones
@@ -97,7 +119,7 @@ export interface ProductoFormActions {
   setCondicion: (value: string) => void;
   setCondicionBateria: (value: string) => void;
   setCosto: (value: string) => void;
-  setProveedor: (value: string) => void;
+  setPersona: (persona: Persona | null) => void;
   setFechaCompra: (value: string) => void;
   setObservacion: (value: string) => void;
   setFallaMacOnline: (value: string) => void;
@@ -130,6 +152,7 @@ export interface ProductoData {
   condicionBateria: number;
   costo: number;
   proveedor: string;
+  personaId?: string;
   fechaCompra: string;
   observacion: string;
   fallaMacOnline: string;
@@ -211,7 +234,7 @@ export interface Reserva {
   condicion: string;
   precioAcordado: number;
   // Origen
-  proveedor: string;
+  proveedor: Proveedor;
   fechaEstimadaLlegada: string;
   // Cliente
   nombreCliente: string;

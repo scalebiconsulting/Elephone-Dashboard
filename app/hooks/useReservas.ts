@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { Reserva } from '@/app/types/producto';
+import { Reserva, Persona } from '@/app/types/producto';
 import { extraerNumero, formatoPesosChilenos } from '@/app/utils/formatters';
 import { toast } from '@/app/components/ui/Toast';
 
@@ -12,11 +12,7 @@ const ESTADO_INICIAL = {
   gb: '',
   condicion: '',
   precioAcordado: '',
-  proveedor: '',
   fechaEstimadaLlegada: '',
-  nombreCliente: '',
-  correoCliente: '',
-  telefonoCliente: '',
   montoSenaEfectivo: '',
   montoSenaTransferencia: '',
   montoSenaDebito: '',
@@ -27,6 +23,8 @@ export function useReservas() {
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [loading, setLoading] = useState(false);
   const [formulario, setFormulario] = useState(ESTADO_INICIAL);
+  const [proveedor, setProveedor] = useState<Persona | null>(null);
+  const [cliente, setCliente] = useState<Persona | null>(null);
   const [editandoId, setEditandoId] = useState<string | null>(null);
 
   // Cargar reservas
@@ -66,12 +64,8 @@ export function useReservas() {
       toast.warning('Ingrese el modelo');
       return false;
     }
-    if (!formulario.nombreCliente.trim() || formulario.nombreCliente.length < 3) {
-      toast.warning('El nombre del cliente debe tener al menos 3 caracteres');
-      return false;
-    }
-    if (!formulario.telefonoCliente.trim()) {
-      toast.warning('Ingrese el teléfono del cliente');
+    if (!cliente || !cliente._id) {
+      toast.warning('Debe seleccionar o crear un cliente');
       return false;
     }
     if (!formulario.precioAcordado || extraerNumero(formulario.precioAcordado) <= 0) {
@@ -94,11 +88,13 @@ export function useReservas() {
         gb: formulario.gb,
         condicion: formulario.condicion,
         precioAcordado: extraerNumero(formulario.precioAcordado),
-        proveedor: formulario.proveedor.toUpperCase(),
+        proveedorId: proveedor?._id,
+        proveedorNombre: proveedor?.nombre || '',
         fechaEstimadaLlegada: formulario.fechaEstimadaLlegada,
-        nombreCliente: formulario.nombreCliente,
-        correoCliente: formulario.correoCliente,
-        telefonoCliente: formulario.telefonoCliente,
+        clienteId: cliente?._id,
+        nombreCliente: cliente?.nombre || '',
+        correoCliente: cliente?.correo || '',
+        telefonoCliente: cliente?.telefono || '',
         montoSenaEfectivo: extraerNumero(formulario.montoSenaEfectivo),
         montoSenaTransferencia: extraerNumero(formulario.montoSenaTransferencia),
         montoSenaDebito: extraerNumero(formulario.montoSenaDebito),
@@ -143,11 +139,13 @@ export function useReservas() {
         gb: formulario.gb,
         condicion: formulario.condicion,
         precioAcordado: extraerNumero(formulario.precioAcordado),
-        proveedor: formulario.proveedor.toUpperCase(),
+        proveedorId: proveedor?._id,
+        proveedorNombre: proveedor?.nombre || '',
         fechaEstimadaLlegada: formulario.fechaEstimadaLlegada,
-        nombreCliente: formulario.nombreCliente,
-        correoCliente: formulario.correoCliente,
-        telefonoCliente: formulario.telefonoCliente,
+        clienteId: cliente?._id,
+        nombreCliente: cliente?.nombre || '',
+        correoCliente: cliente?.correo || '',
+        telefonoCliente: cliente?.telefono || '',
         montoSenaEfectivo: extraerNumero(formulario.montoSenaEfectivo),
         montoSenaTransferencia: extraerNumero(formulario.montoSenaTransferencia),
         montoSenaDebito: extraerNumero(formulario.montoSenaDebito),
@@ -242,21 +240,20 @@ export function useReservas() {
       gb: reserva.gb,
       condicion: reserva.condicion,
       precioAcordado: formatoPesosChilenos(String(reserva.precioAcordado)),
-      proveedor: reserva.proveedor,
       fechaEstimadaLlegada: reserva.fechaEstimadaLlegada,
-      nombreCliente: reserva.nombreCliente,
-      correoCliente: reserva.correoCliente,
-      telefonoCliente: reserva.telefonoCliente,
       montoSenaEfectivo: formatoPesosChilenos(String(reserva.montoSenaEfectivo || 0)),
       montoSenaTransferencia: formatoPesosChilenos(String(reserva.montoSenaTransferencia || 0)),
       montoSenaDebito: formatoPesosChilenos(String(reserva.montoSenaDebito || 0)),
       observaciones: reserva.observaciones,
     });
+    // TODO: Cargar proveedor y cliente desde personas si tienen IDs
   };
 
   // Reset formulario
   const resetFormulario = () => {
     setFormulario(ESTADO_INICIAL);
+    setProveedor(null);
+    setCliente(null);
     setEditandoId(null);
   };
 
@@ -273,11 +270,15 @@ export function useReservas() {
     reservas,
     loading,
     formulario,
+    proveedor,
+    cliente,
     editandoId,
     contadores,
     // Acciones formulario
     updateFormulario,
     handleMoneyChange,
+    setProveedor,
+    setCliente,
     resetFormulario,
     // CRUD
     crearReserva,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ProductoFormState, ProductoFormActions, ProductoData } from '@/app/types/producto';
+import { ProductoFormState, ProductoFormActions, ProductoData, Persona } from '@/app/types/producto';
 import { formatoPesosChilenos, extraerNumero, calcularUtilidad } from '@/app/utils/formatters';
 import { generarCorrelativo, generarSKU, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
 import { VALORES_INICIALES } from '@/app/constants/opciones';
@@ -24,7 +24,7 @@ export function useProductoForm(): UseProductoFormReturn {
   const [sku, setSku] = useState('');
   const [condicionBateria, setCondicionBateria] = useState('');
   const [costo, setCosto] = useState('');
-  const [proveedor, setProveedor] = useState('');
+  const [persona, setPersona] = useState<Persona | null>(null);
   const [fechaCompra, setFechaCompra] = useState('');
 
   // Sección 3 - Observaciones
@@ -93,7 +93,8 @@ export function useProductoForm(): UseProductoFormReturn {
   const resetForm = useCallback(() => {
     setEquipo(''); setModelo(''); setColor(''); setSubModelo(''); setSerie('');
     setGb(''); setCondicion(''); setSku(''); setCondicionBateria('');
-    setCosto(''); setProveedor(''); setFechaCompra(''); setObservacion('');
+    setCosto(''); setPersona(null); 
+    setFechaCompra(''); setObservacion('');
     setFallaMacOnline(''); setGarantiaCompra(''); setBlock(VALORES_INICIALES.block);
     setDatosEquipos(VALORES_INICIALES.datosEquipos); setNumeroSerie(''); 
     setImei1(''); setImei2('');
@@ -122,7 +123,8 @@ export function useProductoForm(): UseProductoFormReturn {
         sku,
         condicionBateria: parseInt(condicionBateria) || 0,
         costo: extraerNumero(costo),
-        proveedor,
+        proveedor: persona?.nombre || '',
+        personaId: persona?._id,
         fechaCompra,
         observacion,
         fallaMacOnline,
@@ -166,7 +168,7 @@ export function useProductoForm(): UseProductoFormReturn {
     }
   }, [
     equipo, modelo, color, subModelo, serie, gb, condicion, modelo2, sku,
-    condicionBateria, costo, proveedor, fechaCompra, observacion, fallaMacOnline,
+    condicionBateria, costo, persona, fechaCompra, observacion, fallaMacOnline,
     garantiaCompra, block, datosEquipos, numeroSerie, imei1, imei2, concatenacion,
     estado, fecha, metodoPago, repuesto, pvpEfectivo, pvpCredito, utilidad,
     utilidad2, tresPorCiento, resetForm
@@ -196,7 +198,7 @@ export function useProductoForm(): UseProductoFormReturn {
   return {
     // State
     equipo, modelo, color, subModelo, serie, gb, condicion, modelo2,
-    correlativo, sku, condicionBateria, costo, proveedor, fechaCompra,
+    correlativo, sku, condicionBateria, costo, persona, fechaCompra,
     observacion, fallaMacOnline, garantiaCompra, block, datosEquipos,
     numeroSerie, imei1, imei2, concatenacion, estado, fecha, metodoPago,
     repuesto, pvpEfectivo, pvpCredito, utilidad, utilidad2, tresPorCiento,
@@ -206,7 +208,7 @@ export function useProductoForm(): UseProductoFormReturn {
     setEquipo, setModelo, setColor, setSubModelo, setSerie, setGb, setCondicion,
     setCondicionBateria, 
     setCosto: handleSetCosto,
-    setProveedor, setFechaCompra,
+    setPersona, setFechaCompra,
     setObservacion, setFallaMacOnline, setGarantiaCompra, setBlock, setDatosEquipos,
     setNumeroSerie, setImei1, setImei2, setEstado, setFecha,
     setRepuesto: handleSetRepuesto,

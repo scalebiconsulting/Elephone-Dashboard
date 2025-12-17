@@ -11,6 +11,7 @@ import {
   PreciosUtilidad,
   BasaleExport
 } from '@/app/components/forms/ingresos';
+import SelectorPersona from '@/app/components/forms/shared/SelectorPersona';
 
 export default function IngresosModule() {
   const form = useProductoForm();
@@ -55,12 +56,18 @@ export default function IngresosModule() {
           sku={form.sku}
           condicionBateria={form.condicionBateria}
           costo={form.costo}
-          proveedor={form.proveedor}
           fechaCompra={form.fechaCompra}
           setCondicionBateria={form.setCondicionBateria}
           setCosto={form.setCosto}
-          setProveedor={form.setProveedor}
           setFechaCompra={form.setFechaCompra}
+        />
+
+        {/* Sección 2.1 - Datos del Proveedor */}
+        <SelectorPersona
+          persona={form.persona}
+          onPersonaChange={form.setPersona}
+          roles={['PROVEEDOR']}
+          titulo="Datos del Proveedor"
         />
 
         {/* Sección 3 - Observaciones */}

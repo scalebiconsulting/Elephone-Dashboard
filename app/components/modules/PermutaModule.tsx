@@ -4,7 +4,7 @@ import { usePermuta } from '@/app/hooks/usePermuta';
 import { extraerNumero } from '@/app/utils/formatters';
 import FormularioProductoPermuta from '@/app/components/forms/permuta/FormularioProductoPermuta';
 import BuscadorProductoVenta from '@/app/components/forms/permuta/BuscadorProductoVenta';
-import DatosCliente from '@/app/components/forms/pos/DatosCliente';
+import SelectorPersona from '@/app/components/forms/shared/SelectorPersona';
 import ResumenPermuta from '@/app/components/forms/permuta/ResumenPermuta';
 import HistorialPermutas from '@/app/components/forms/permuta/HistorialPermutas';
 import { ArrowLeftRight } from 'lucide-react';
@@ -14,6 +14,7 @@ export default function PermutaModule() {
     // Producto permuta
     productoPermuta,
     updateProductoPermuta,
+    updateValorPermuta,
     // Búsqueda
     skuBusqueda,
     setSkuBusqueda,
@@ -22,13 +23,9 @@ export default function PermutaModule() {
     buscando,
     errorBusqueda,
     buscarProductoPorSku,
-    // Cliente
-    nombreCliente,
-    setNombreCliente,
-    correoCliente,
-    setCorreoCliente,
-    telefonoCliente,
-    setTelefonoCliente,
+    // Persona unificada
+    persona,
+    setPersona,
     // Pago
     montoEfectivo,
     setMontoEfectivo,
@@ -64,6 +61,7 @@ export default function PermutaModule() {
       <FormularioProductoPermuta
         productoPermuta={productoPermuta}
         updateProductoPermuta={updateProductoPermuta}
+        updateValorPermuta={updateValorPermuta}
       />
 
       {/* Fila 2: Producto a Vender - Ancho completo */}
@@ -77,15 +75,13 @@ export default function PermutaModule() {
         buscarProductoPorSku={buscarProductoPorSku}
       />
 
-      {/* Fila 3: Datos Cliente | Resumen Permuta */}
+      {/* Fila 3: Datos Persona | Resumen Permuta */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DatosCliente
-          nombreCliente={nombreCliente}
-          setNombreCliente={setNombreCliente}
-          correoCliente={correoCliente}
-          setCorreoCliente={setCorreoCliente}
-          telefonoCliente={telefonoCliente}
-          setTelefonoCliente={setTelefonoCliente}
+        <SelectorPersona
+          persona={persona}
+          onPersonaChange={setPersona}
+          roles={['CLIENTE', 'PROVEEDOR']}
+          titulo="Datos del Cliente / Proveedor"
         />
         <div className="space-y-6">
           <ResumenPermuta

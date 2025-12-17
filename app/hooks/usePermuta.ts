@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ProductoInventario, Permuta } from '@/app/types/producto';
+import { ProductoInventario, Permuta, Persona } from '@/app/types/producto';
 import { extraerNumero, formatoPesosChilenos } from '@/app/utils/formatters';
 import { generarSKU, generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
 import { toast } from '@/app/components/ui/Toast';
@@ -21,7 +21,6 @@ export function usePermuta() {
     correlativo: generarCorrelativo(),
     condicionBateria: '',
     costo: '',
-    proveedor: '',
     fechaCompra: new Date().toISOString().split('T')[0],
     observacion: '',
     fallaMacOnline: '',
@@ -45,10 +44,8 @@ export function usePermuta() {
   const [buscando, setBuscando] = useState(false);
   const [errorBusqueda, setErrorBusqueda] = useState('');
 
-  // Cliente
-  const [nombreCliente, setNombreCliente] = useState('');
-  const [correoCliente, setCorreoCliente] = useState('');
-  const [telefonoCliente, setTelefonoCliente] = useState('');
+  // Persona unificada (cliente = proveedor en permutas)
+  const [persona, setPersona] = useState<Persona | null>(null);
 
   // Pago/Devolución
   const [montoEfectivo, setMontoEfectivo] = useState('');
@@ -92,6 +89,22 @@ export function usePermuta() {
     const concatenacion = generarConcatenacion(imei1Val, imei2Val);
     setProductoPermuta(prev => prev.concatenacion !== concatenacion ? { ...prev, concatenacion } : prev);
   }, [imei1Val, imei2Val]);
+
+  // Auto-completar valorPermuta con costo (siempre sincroniza mientras no se edite manualmente)
+  const costoVal = productoPermuta.costo;
+  const [valorPermutaEditado, setValorPermutaEditado] = useState(false);
+  
+  useEffect(() => {
+    if (costoVal && !valorPermutaEditado) {
+      setProductoPermuta(prev => ({ ...prev, valorPermuta: costoVal }));
+    }
+  }, [costoVal, valorPermutaEditado]);
+
+  // Función para actualizar valorPermuta manualmente
+  const updateValorPermuta = useCallback((valor: string) => {
+    setValorPermutaEditado(true);
+    setProductoPermuta(prev => ({ ...prev, valorPermuta: valor }));
+  }, []);
 
   // Cargar permutas
   useEffect(() => {
@@ -218,14 +231,13 @@ export function usePermuta() {
       return false;
     }
 
-    if (!nombreCliente.trim() || nombreCliente.length < 3) {
-      toast.warning('El nombre del cliente debe tener al menos 3 caracteres');
+    if (!persona || !persona._id) {
+      toast.warning('Debe seleccionar o crear una persona para la permuta');
       return false;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!correoCliente.trim() || !emailRegex.test(correoCliente)) {
-      toast.warning('Ingrese un correo electrónico válido');
+    if (!productoPermuta.valorPermuta || extraerNumero(productoPermuta.valorPermuta) <= 0) {
+      toast.warning('Ingrese el valor de permuta');
       return false;
     }
 
@@ -269,7 +281,8 @@ export function usePermuta() {
         sku,
         condicionBateria: parseInt(productoPermuta.condicionBateria) || 0,
         costo: extraerNumero(productoPermuta.costo),
-        proveedor: nombreCliente, // El cliente es el proveedor
+        proveedor: persona?.nombre || '', // El cliente/persona es el proveedor
+        personaId: persona?._id,
         fechaCompra: productoPermuta.fechaCompra,
         observacion: productoPermuta.observacion,
         fallaMacOnline: productoPermuta.fallaMacOnline,
@@ -325,9 +338,10 @@ export function usePermuta() {
         montoEfectivo: extraerNumero(montoEfectivo),
         montoTransferencia: extraerNumero(montoTransferencia),
         montoDebito: extraerNumero(montoDebito),
-        nombreCliente,
-        correoCliente,
-        telefonoCliente,
+        personaId: persona?._id,
+        nombreCliente: persona?.nombre || '',
+        correoCliente: persona?.correo || '',
+        telefonoCliente: persona?.telefono || '',
         fechaPermuta: new Date().toISOString(),
         estadoPermuta,
         utilidad: calcularUtilidad(),
@@ -370,7 +384,6 @@ export function usePermuta() {
       correlativo: generarCorrelativo(),
       condicionBateria: '',
       costo: '',
-      proveedor: '',
       fechaCompra: new Date().toISOString().split('T')[0],
       observacion: '',
       fallaMacOnline: '',
@@ -390,19 +403,19 @@ export function usePermuta() {
     setSkuBusqueda('');
     setProductoVenta(null);
     setErrorBusqueda('');
-    setNombreCliente('');
-    setCorreoCliente('');
-    setTelefonoCliente('');
+    setPersona(null);
     setMontoEfectivo('');
     setMontoTransferencia('');
     setMontoDebito('');
     setEstadoPermuta('PENDIENTE');
+    setValorPermutaEditado(false);
   };
 
   return {
     // Producto permuta
     productoPermuta,
     updateProductoPermuta,
+    updateValorPermuta,
     // Búsqueda
     skuBusqueda,
     setSkuBusqueda,
@@ -411,13 +424,9 @@ export function usePermuta() {
     buscando,
     errorBusqueda,
     buscarProductoPorSku,
-    // Cliente
-    nombreCliente,
-    setNombreCliente,
-    correoCliente,
-    setCorreoCliente,
-    telefonoCliente,
-    setTelefonoCliente,
+    // Persona unificada
+    persona,
+    setPersona,
     // Pago
     montoEfectivo,
     setMontoEfectivo: handleSetMontoEfectivo,

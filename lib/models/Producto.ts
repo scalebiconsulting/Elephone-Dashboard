@@ -1,5 +1,14 @@
 import { ObjectId } from 'mongodb';
 
+// Interface para datos del proveedor
+export interface ProveedorData {
+  nombre: string;
+  correo: string;
+  telefono: string;
+  direccion: string;
+  documentos: string[]; // base64 strings
+}
+
 export interface Producto {
   _id?: ObjectId;
   // Sección 1 - Identificación
@@ -15,7 +24,7 @@ export interface Producto {
   sku: string;
   condicionBateria: number;
   costo: number;
-  proveedor: string;
+  proveedor: ProveedorData;
   fechaCompra: string;
   // Sección 3 - Observaciones
   observacion?: string;

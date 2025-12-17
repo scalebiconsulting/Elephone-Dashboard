@@ -6,17 +6,15 @@ interface DetallesCompraProps {
   sku: string;
   condicionBateria: string;
   costo: string;
-  proveedor: string;
   fechaCompra: string;
   setCondicionBateria: (value: string) => void;
   setCosto: (value: string) => void;
-  setProveedor: (value: string) => void;
   setFechaCompra: (value: string) => void;
 }
 
 export default function DetallesCompra({
-  sku, condicionBateria, costo, proveedor, fechaCompra,
-  setCondicionBateria, setCosto, setProveedor, setFechaCompra
+  sku, condicionBateria, costo, fechaCompra,
+  setCondicionBateria, setCosto, setFechaCompra
 }: DetallesCompraProps) {
   return (
     <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
@@ -73,28 +71,12 @@ export default function DetallesCompra({
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-400 mb-2">
-            12. PROVEEDOR <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={proveedor}
-            onChange={(e) => setProveedor(e.target.value.toUpperCase())}
-            required
-            className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-            placeholder="Nombre del Proveedor"
-          />
-        </div>
-
-        <div className="lg:col-span-1">
-          <DateInput
-            label="13. FECHA DE COMPRA"
-            value={fechaCompra}
-            onChange={setFechaCompra}
-            required
-          />
-        </div>
+        <DateInput
+          label="12. FECHA DE COMPRA"
+          value={fechaCompra}
+          onChange={setFechaCompra}
+          required
+        />
       </div>
     </div>
   );
