@@ -95,6 +95,8 @@ export default function FormularioProductoPermuta({
         setCondicionBateria={(v) => updateProductoPermuta('condicionBateria', v)}
         setCosto={(v) => handleMoneyChange('costo', v)}
         setFechaCompra={(v) => updateProductoPermuta('fechaCompra', v)}
+        buscandoSku={false}
+        skuNoEncontrado={false}
       />
 
       {/* Sección 3 - Observaciones (modo simple = solo observación) */}

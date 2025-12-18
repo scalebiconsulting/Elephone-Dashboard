@@ -14,10 +14,11 @@ export const generarCorrelativo = (): string => {
 };
 
 /**
- * Genera el MODELO2 concatenando los valores del producto
- * @param equipo - Nombre del equipo
+ * Genera el MODELO2 concatenando los valores del producto según el tipo de equipo
+ * @param equipo - Nombre del equipo (determina el formato)
  * @param serie - Serie
  * @param modelo - Modelo
+ * @param subModelo - Sub Modelo
  * @param gb - Capacidad en GB
  * @param color - Color
  * @param condicion - Condición
@@ -27,13 +28,32 @@ export const generarModelo2 = (
   equipo: string,
   serie: string,
   modelo: string,
+  subModelo: string,
   gb: string,
   color: string,
   condicion: string
 ): string => {
-  const gbConSufijo = gb ? `${gb} GB` : '';
-  return [equipo, serie, modelo, gbConSufijo, color, condicion]
-    .filter(val => val.trim() !== '')
+  const equipoUpper = equipo.trim().toUpperCase();
+  
+  // IPHONE: IPHONE + SERIE + MODELO + GB GB + COLOR + CONDICIÓN
+  if (equipoUpper === 'IPHONE') {
+    const gbConSufijo = gb ? `${gb} GB` : '';
+    return [equipo, serie, modelo, gbConSufijo, color, condicion]
+      .filter(val => val && val.trim() !== '')
+      .join(' ');
+  }
+  
+  // APPLE WATCH: EQUIPO + (MODELO SUB MODELO) + GB (sin sufijo) + COLOR + CONDICIÓN
+  if (equipoUpper === 'APPLE WATCH') {
+    const modeloCompleto = [modelo, subModelo].filter(val => val && val.trim() !== '').join(' ');
+    return [equipo, modeloCompleto, gb, color, condicion]
+      .filter(val => val && val.trim() !== '')
+      .join(' ');
+  }
+  
+  // ACCESORIO (default): EQUIPO + MODELO + SUB MODELO + SERIE + COLOR
+  return [equipo, modelo, subModelo, serie, color]
+    .filter(val => val && val.trim() !== '')
     .join(' ');
 };
 

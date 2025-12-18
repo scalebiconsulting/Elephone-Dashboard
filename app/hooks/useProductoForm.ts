@@ -57,10 +57,24 @@ export function useProductoForm(): UseProductoFormReturn {
   const [skuNoEncontrado, setSkuNoEncontrado] = useState(false);
   const [buscandoSku, setBuscandoSku] = useState(false);
 
-  // Generar MODELO2 dinámicamente
+  // Limpiar campos de identificación cuando cambia el tipo de equipo
   useEffect(() => {
-    setModelo2(generarModelo2(equipo, serie, modelo, gb, color, condicion));
-  }, [equipo, serie, modelo, gb, color, condicion]);
+    if (equipo) {
+      setModelo('');
+      setColor('');
+      setSubModelo('');
+      setSerie('');
+      setGb('');
+      setCondicion('');
+      setSku('');
+      setSkuNoEncontrado(false);
+    }
+  }, [equipo]);
+
+  // Generar MODELO2 dinámicamente según tipo de equipo
+  useEffect(() => {
+    setModelo2(generarModelo2(equipo, serie, modelo, subModelo, gb, color, condicion));
+  }, [equipo, serie, modelo, subModelo, gb, color, condicion]);
 
   // Generar CONCATENACIÓN dinámicamente
   useEffect(() => {

@@ -71,9 +71,9 @@ export function usePermuta() {
 
   // Auto-generar modelo2
   useEffect(() => {
-    const modelo2 = generarModelo2(equipoVal, serieVal, productoPermuta.modelo, gbVal, colorVal, condicionVal);
+    const modelo2 = generarModelo2(equipoVal, serieVal, productoPermuta.modelo, productoPermuta.subModelo, gbVal, colorVal, condicionVal);
     setProductoPermuta(prev => prev.modelo2 !== modelo2 ? { ...prev, modelo2 } : prev);
-  }, [equipoVal, serieVal, productoPermuta.modelo, gbVal, colorVal, condicionVal]);
+  }, [equipoVal, serieVal, productoPermuta.modelo, productoPermuta.subModelo, gbVal, colorVal, condicionVal]);
 
   // Buscar SKU en MongoDB cuando cambia MODELO2
   useEffect(() => {
@@ -288,7 +288,6 @@ export function usePermuta() {
 
     try {
       // 1. Registrar producto del cliente en inventario
-      const correlativo = generarCorrelativo();
       const modelo2 = `${productoPermuta.equipo} ${productoPermuta.serie} ${productoPermuta.gb} GB ${productoPermuta.color} ${productoPermuta.condicion}`.toUpperCase();
       // Usar el SKU del estado (ya fue buscado en la API)
       const sku = productoPermuta.sku;
