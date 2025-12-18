@@ -101,6 +101,10 @@ export interface ProductoFormState {
 
   // Estado de carga
   loading: boolean;
+  
+  // Estado de SKU lookup
+  skuNoEncontrado: boolean;
+  buscandoSku: boolean;
 }
 
 export interface ProductoFormActions {

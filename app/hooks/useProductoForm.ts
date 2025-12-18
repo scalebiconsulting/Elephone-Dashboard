@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ProductoFormState, ProductoFormActions, ProductoData, Persona } from '@/app/types/producto';
 import { formatoPesosChilenos, extraerNumero, calcularUtilidad } from '@/app/utils/formatters';
-import { generarCorrelativo, generarSKU, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
+import { generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
 import { VALORES_INICIALES } from '@/app/constants/opciones';
 
 export interface UseProductoFormReturn extends ProductoFormState, ProductoFormActions {}
@@ -54,6 +54,8 @@ export function useProductoForm(): UseProductoFormReturn {
   const [tresPorCiento, setTresPorCiento] = useState('');
 
   const [loading, setLoading] = useState(false);
+  const [skuNoEncontrado, setSkuNoEncontrado] = useState(false);
+  const [buscandoSku, setBuscandoSku] = useState(false);
 
   // Generar MODELO2 dinámicamente
   useEffect(() => {
@@ -65,10 +67,41 @@ export function useProductoForm(): UseProductoFormReturn {
     setConcatenacion(generarConcatenacion(imei1, imei2));
   }, [imei1, imei2]);
 
-  // Generar SKU dinámicamente
+  // Buscar SKU en MongoDB cuando cambia MODELO2
   useEffect(() => {
-    setSku(generarSKU(equipo, serie, subModelo, color, gb, condicion, correlativo));
-  }, [equipo, serie, subModelo, color, gb, condicion, correlativo]);
+    const buscarSku = async () => {
+      // Solo buscar si modelo2 tiene contenido significativo
+      if (!modelo2 || modelo2.trim().length < 5) {
+        setSku('');
+        setSkuNoEncontrado(false);
+        return;
+      }
+
+      setBuscandoSku(true);
+      try {
+        const response = await fetch(`/api/sku?modelo2=${encodeURIComponent(modelo2)}`);
+        const data = await response.json();
+        
+        if (data.found && data.sku) {
+          setSku(data.sku);
+          setSkuNoEncontrado(false);
+        } else {
+          setSku('');
+          setSkuNoEncontrado(true);
+        }
+      } catch (error) {
+        console.error('Error buscando SKU:', error);
+        setSku('');
+        setSkuNoEncontrado(true);
+      } finally {
+        setBuscandoSku(false);
+      }
+    };
+
+    // Debounce para evitar muchas llamadas
+    const timeoutId = setTimeout(buscarSku, 300);
+    return () => clearTimeout(timeoutId);
+  }, [modelo2]);
 
   // Calcular UTILIDAD dinámicamente
   useEffect(() => {
@@ -102,6 +135,8 @@ export function useProductoForm(): UseProductoFormReturn {
     setRepuesto(''); setPvpEfectivo(''); setPvpCredito(''); 
     setUtilidad(''); setUtilidad2(''); setTresPorCiento('');
     setCorrelativo(generarCorrelativo());
+    setSkuNoEncontrado(false);
+    setBuscandoSku(false);
   }, []);
 
   // Enviar formulario
@@ -202,7 +237,7 @@ export function useProductoForm(): UseProductoFormReturn {
     observacion, fallaMacOnline, garantiaCompra, block, datosEquipos,
     numeroSerie, imei1, imei2, concatenacion, estado, fecha, metodoPago,
     repuesto, pvpEfectivo, pvpCredito, utilidad, utilidad2, tresPorCiento,
-    loading,
+    loading, skuNoEncontrado, buscandoSku,
 
     // Actions
     setEquipo, setModelo, setColor, setSubModelo, setSerie, setGb, setCondicion,

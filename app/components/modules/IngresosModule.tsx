@@ -54,6 +54,8 @@ export default function IngresosModule() {
         {/* Sección 2 - Detalles de Compra */}
         <DetallesCompra
           sku={form.sku}
+          buscandoSku={form.buscandoSku}
+          skuNoEncontrado={form.skuNoEncontrado}
           condicionBateria={form.condicionBateria}
           costo={form.costo}
           fechaCompra={form.fechaCompra}

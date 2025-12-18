@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ProductoInventario, Permuta, Persona } from '@/app/types/producto';
 import { extraerNumero, formatoPesosChilenos } from '@/app/utils/formatters';
-import { generarSKU, generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
+import { generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
 import { toast } from '@/app/components/ui/Toast';
 
 export function usePermuta() {
@@ -57,14 +57,17 @@ export function usePermuta() {
   const [permutas, setPermutas] = useState<Permuta[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Estado para SKU no encontrado
+  const [skuNoEncontrado, setSkuNoEncontrado] = useState(false);
+  const [buscandoSkuPermuta, setBuscandoSkuPermuta] = useState(false);
+
   // Variables para generar modelo2 y SKU
   const equipoVal = productoPermuta.equipo;
   const serieVal = productoPermuta.serie;
   const gbVal = productoPermuta.gb;
   const colorVal = productoPermuta.color;
   const condicionVal = productoPermuta.condicion;
-  const subModeloVal = productoPermuta.subModelo;
-  const correlativoVal = productoPermuta.correlativo;
+  const modelo2Val = productoPermuta.modelo2;
 
   // Auto-generar modelo2
   useEffect(() => {
@@ -72,13 +75,41 @@ export function usePermuta() {
     setProductoPermuta(prev => prev.modelo2 !== modelo2 ? { ...prev, modelo2 } : prev);
   }, [equipoVal, serieVal, productoPermuta.modelo, gbVal, colorVal, condicionVal]);
 
-  // Auto-generar SKU
+  // Buscar SKU en MongoDB cuando cambia MODELO2
   useEffect(() => {
-    if (equipoVal && serieVal && colorVal && gbVal && condicionVal && correlativoVal) {
-      const sku = generarSKU(equipoVal, serieVal, subModeloVal || '', colorVal, gbVal, condicionVal, correlativoVal);
-      setProductoPermuta(prev => prev.sku !== sku ? { ...prev, sku } : prev);
-    }
-  }, [equipoVal, serieVal, subModeloVal, colorVal, gbVal, condicionVal, correlativoVal]);
+    const buscarSku = async () => {
+      // Solo buscar si modelo2 tiene contenido significativo
+      if (!modelo2Val || modelo2Val.trim().length < 5) {
+        setProductoPermuta(prev => prev.sku !== '' ? { ...prev, sku: '' } : prev);
+        setSkuNoEncontrado(false);
+        return;
+      }
+
+      setBuscandoSkuPermuta(true);
+      try {
+        const response = await fetch(`/api/sku?modelo2=${encodeURIComponent(modelo2Val)}`);
+        const data = await response.json();
+        
+        if (data.found && data.sku) {
+          setProductoPermuta(prev => prev.sku !== data.sku ? { ...prev, sku: data.sku } : prev);
+          setSkuNoEncontrado(false);
+        } else {
+          setProductoPermuta(prev => prev.sku !== '' ? { ...prev, sku: '' } : prev);
+          setSkuNoEncontrado(true);
+        }
+      } catch (error) {
+        console.error('Error buscando SKU:', error);
+        setProductoPermuta(prev => prev.sku !== '' ? { ...prev, sku: '' } : prev);
+        setSkuNoEncontrado(true);
+      } finally {
+        setBuscandoSkuPermuta(false);
+      }
+    };
+
+    // Debounce para evitar muchas llamadas
+    const timeoutId = setTimeout(buscarSku, 300);
+    return () => clearTimeout(timeoutId);
+  }, [modelo2Val]);
 
   // Variables para concatenación
   const imei1Val = productoPermuta.imei1;
@@ -259,15 +290,8 @@ export function usePermuta() {
       // 1. Registrar producto del cliente en inventario
       const correlativo = generarCorrelativo();
       const modelo2 = `${productoPermuta.equipo} ${productoPermuta.serie} ${productoPermuta.gb} GB ${productoPermuta.color} ${productoPermuta.condicion}`.toUpperCase();
-      const sku = generarSKU(
-        productoPermuta.equipo,
-        productoPermuta.serie,
-        productoPermuta.subModelo || '',
-        productoPermuta.color,
-        productoPermuta.gb,
-        productoPermuta.condicion,
-        correlativo
-      );
+      // Usar el SKU del estado (ya fue buscado en la API)
+      const sku = productoPermuta.sku;
 
       const nuevoProducto = {
         equipo: productoPermuta.equipo.toUpperCase(),
@@ -409,6 +433,8 @@ export function usePermuta() {
     setMontoDebito('');
     setEstadoPermuta('PENDIENTE');
     setValorPermutaEditado(false);
+    setSkuNoEncontrado(false);
+    setBuscandoSkuPermuta(false);
   };
 
   return {
@@ -436,6 +462,9 @@ export function usePermuta() {
     setMontoDebito: handleSetMontoDebito,
     estadoPermuta,
     setEstadoPermuta,
+    // SKU lookup
+    skuNoEncontrado,
+    buscandoSkuPermuta,
     // Cálculos
     calcularDiferencia,
     getTipoTransaccion,

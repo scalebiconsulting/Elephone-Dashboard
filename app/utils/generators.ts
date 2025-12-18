@@ -14,39 +14,6 @@ export const generarCorrelativo = (): string => {
 };
 
 /**
- * Genera el SKU del producto
- * @param equipo - Nombre del equipo
- * @param serie - Serie del equipo
- * @param subModelo - Sub modelo
- * @param color - Color
- * @param gb - Capacidad en GB
- * @param condicion - Condición del producto
- * @param correlativo - Correlativo UUID
- * @returns SKU generado
- */
-export const generarSKU = (
-  equipo: string,
-  serie: string,
-  subModelo: string,
-  color: string,
-  gb: string,
-  condicion: string,
-  correlativo: string
-): string => {
-  const equipoPart = equipo.slice(0, 3);
-  const seriePart = serie;
-  const subModeloPart = subModelo.slice(0, 2);
-  const colorPart = color.slice(0, 2);
-  const gbPart = gb;
-  const condicionPart = condicion.slice(0, 2);
-  
-  if (equipoPart || seriePart || subModeloPart || colorPart || gbPart || condicionPart) {
-    return `${equipoPart}${seriePart}-${subModeloPart}-${colorPart}${gbPart}${condicionPart}-${correlativo}`;
-  }
-  return '';
-};
-
-/**
  * Genera el MODELO2 concatenando los valores del producto
  * @param equipo - Nombre del equipo
  * @param serie - Serie
