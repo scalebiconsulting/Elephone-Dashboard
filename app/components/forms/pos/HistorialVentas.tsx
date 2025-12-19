@@ -60,7 +60,6 @@ export default function HistorialVentas({ ventas }: HistorialVentasProps) {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button
-                      onClick={() => console.log('Ver detalles de venta:', venta.sku)}
                       className="p-2 text-slate-400 hover:text-[#0ea5e9] hover:bg-[#0ea5e9]/10 rounded-lg transition-colors"
                       title="Ver detalles"
                     >

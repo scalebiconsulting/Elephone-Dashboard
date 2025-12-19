@@ -238,7 +238,7 @@ export function useProductoForm(): UseProductoFormReturn {
         condicionBateria: parseInt(condicionBateria) || 0,
         costo: extraerNumero(costo),
         proveedor: persona?.nombre || '',
-        personaId: persona?._id,
+        personaId: persona?._id ? String(persona._id) : undefined,
         fechaCompra,
         observacion,
         fallaMacOnline,

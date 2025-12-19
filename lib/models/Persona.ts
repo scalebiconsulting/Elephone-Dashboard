@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 export interface Persona {
-  _id?: ObjectId;
+  _id?: string | ObjectId;
   nombre: string;
   correo: string;
   telefono: string;

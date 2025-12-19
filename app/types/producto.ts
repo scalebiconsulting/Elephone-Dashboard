@@ -1,20 +1,9 @@
 // Tipos para el formulario de productos
 import type { ProveedorData } from '@/lib/models/Producto';
+import type { Persona } from '@/lib/models/Persona';
 
-// Interface para Persona (unifica Cliente y Proveedor)
-export interface Persona {
-  _id?: string;
-  nombre: string;
-  correo: string;
-  telefono: string;
-  direccion: string;
-  documentos: string[]; // base64 strings
-  roles: ('CLIENTE' | 'PROVEEDOR')[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-// Para datos de proveedor en productos, usar ProveedorData del modelo
+// Re-exportar Persona desde el modelo central (evita duplicación)
+export type { Persona };
 
 // Interface para producto del inventario (desde BD)
 export interface ProductoInventario {

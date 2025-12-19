@@ -346,7 +346,7 @@ export default function SelectorPersona({
               {resultados.length > 0 ? (
                 resultados.map((p) => (
                   <button
-                    key={p._id}
+                    key={String(p._id)}
                     type="button"
                     onClick={() => seleccionarPersona(p)}
                     className="w-full px-4 py-3 text-left hover:bg-[#334155] transition-colors flex items-center gap-3"
