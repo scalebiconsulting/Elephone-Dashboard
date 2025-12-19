@@ -71,18 +71,31 @@ export function useProductoForm(): UseProductoFormReturn {
     }
   }, [equipo]);
 
-  // Limpiar modelo cuando cambia la serie (para iPhone)
+  // Limpiar modelo, GB y COLOR cuando cambia la serie (para iPhone)
   useEffect(() => {
     if (equipo === 'IPHONE' && serie) {
       setModelo('');
+      setGb('');
+      setColor('');
     }
   }, [serie, equipo]);
+
+  // Limpiar GB y COLOR cuando cambia el modelo (para iPhone)
+  useEffect(() => {
+    if (equipo === 'IPHONE' && modelo !== undefined) {
+      setGb('');
+      setColor('');
+    }
+  }, [modelo, equipo]);
 
   // Limpiar gama (subModelo) cuando cambia el modelo (para Apple Watch y Accesorio)
   // Para Accesorio también limpiar serie y color ya que dependen del modelo
   useEffect(() => {
     if (equipo === 'APPLE WATCH' && modelo) {
       setSubModelo('');
+      setGb('');
+      setColor('');
+      setCondicion('');
     }
     if (equipo === 'ACCESORIO' && modelo) {
       setSubModelo('');
@@ -90,6 +103,38 @@ export function useProductoForm(): UseProductoFormReturn {
       setColor('');
     }
   }, [modelo, equipo]);
+
+  // Limpiar capacidad, color y condición cuando cambia la gama (para Apple Watch)
+  useEffect(() => {
+    if (equipo === 'APPLE WATCH' && subModelo) {
+      setGb('');
+      setColor('');
+      setCondicion('');
+    }
+  }, [subModelo, equipo]);
+
+  // Limpiar serie y color cuando cambia la gama (para Accesorio)
+  useEffect(() => {
+    if (equipo === 'ACCESORIO' && subModelo) {
+      setSerie('');
+      setColor('');
+    }
+  }, [subModelo, equipo]);
+
+  // Limpiar color cuando cambia la serie (para Accesorio)
+  useEffect(() => {
+    if (equipo === 'ACCESORIO' && serie) {
+      setColor('');
+    }
+  }, [serie, equipo]);
+
+  // Limpiar color y condición cuando cambia la capacidad (para Apple Watch)
+  useEffect(() => {
+    if (equipo === 'APPLE WATCH' && gb) {
+      setColor('');
+      setCondicion('');
+    }
+  }, [gb, equipo]);
 
   // Generar MODELO2 dinámicamente según tipo de equipo
   useEffect(() => {
