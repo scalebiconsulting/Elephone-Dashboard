@@ -120,13 +120,12 @@ export default function FormularioProductoPermuta({
         showDatosEquipos={false}
       />
 
-      {/* Sección 5 - Inventario (sin métodos de pago) */}
+      {/* Sección 5 - Inventario */}
       <Inventario
         estado={productoPermuta.estado}
         fecha={productoPermuta.fechaCompra}
         setEstado={(v) => updateProductoPermuta('estado', v)}
         setFecha={(v) => updateProductoPermuta('fechaCompra', v)}
-        showMetodoPago={false}
       />
 
       {/* Sección 6 - Precios (con valor de permuta, sin utilidades) */}

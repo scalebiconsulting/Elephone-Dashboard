@@ -208,7 +208,6 @@ export function useProductoForm(): UseProductoFormReturn {
     setCosto(''); setPersona(null); 
     setFechaCompra(''); setObservacion('');
     setFallaMacOnline(''); setGarantiaCompra(''); setBlock(VALORES_INICIALES.block);
-    setDatosEquipos(VALORES_INICIALES.datosEquipos); setNumeroSerie(''); 
     setImei1(''); setImei2('');
     setEstado(VALORES_INICIALES.estado); setFecha(''); setMetodoPago([]);
     setRepuesto(''); setPvpEfectivo(''); setPvpCredito(''); 

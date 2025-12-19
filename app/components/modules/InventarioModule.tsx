@@ -20,17 +20,14 @@ export default function InventarioModule({ onSelectForSale, onChangeModule }: In
     searchTerm,
     filtroEquipo,
     filtroCondicion,
-    filtroEstado,
-    productosFiltrados,
+    productosEnStock,
     totalProductos,
     valorInventario,
     equiposUnicos,
     condicionesUnicas,
-    estadosUnicos,
     setSearchTerm,
     setFiltroEquipo,
     setFiltroCondicion,
-    setFiltroEstado,
     fetchProductos,
     handleDelete,
   } = useInventario();
@@ -130,24 +127,12 @@ export default function InventarioModule({ onSelectForSale, onChangeModule }: In
               <option key={condicion} value={condicion}>{condicion}</option>
             ))}
           </select>
-
-          {/* Filtro Estado */}
-          <select
-            value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}
-            className="px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-          >
-            <option value="">Todos los estados</option>
-            {estadosUnicos.map((estado) => (
-              <option key={estado} value={estado}>{estado}</option>
-            ))}
-          </select>
         </div>
       </div>
 
       {/* Tabla */}
       <TablaInventario
-        productos={productosFiltrados}
+        productos={productosEnStock}
         totalProductos={productos.length}
         loading={loading}
         onDelete={handleDelete}

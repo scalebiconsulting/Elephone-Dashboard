@@ -25,7 +25,7 @@ export default function DetallesCompra({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">
-            9. SKU (Basado en MODELO2)
+            SKU (Basado en MODELO2)
           </label>
           <div className="relative">
             <input
@@ -56,7 +56,7 @@ export default function DetallesCompra({
 
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">
-            10. CONDICIÓN BATERÍA (%) <span className="text-red-500">*</span>
+            CONDICIÓN BATERÍA (%) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -74,7 +74,7 @@ export default function DetallesCompra({
 
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">
-            11. COSTO (CLP) <span className="text-red-500">*</span>
+            COSTO (CLP) <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
@@ -91,7 +91,7 @@ export default function DetallesCompra({
         </div>
 
         <DateInput
-          label="12. FECHA DE COMPRA"
+          label="FECHA DE COMPRA"
           value={fechaCompra}
           onChange={setFechaCompra}
           required

@@ -1,6 +1,6 @@
 "use client";
 
-import { OPCIONES_BLOCK, OPCIONES_DATOS_EQUIPOS } from '@/app/constants/opciones';
+import { OPCIONES_BLOCK, } from '@/app/constants/opciones';
 
 interface EstadoEquipoProps {
   block: string;
@@ -10,7 +10,7 @@ interface EstadoEquipoProps {
   imei2: string;
   concatenacion: string;
   setBlock: (value: string) => void;
-  setDatosEquipos?: (value: string) => void;
+  
   setNumeroSerie: (value: string) => void;
   setImei1: (value: string) => void;
   setImei2: (value: string) => void;
@@ -18,9 +18,9 @@ interface EstadoEquipoProps {
 }
 
 export default function EstadoEquipo({
-  block, datosEquipos, numeroSerie, imei1, imei2, concatenacion,
-  setBlock, setDatosEquipos, setNumeroSerie, setImei1, setImei2,
-  showDatosEquipos = true
+  block, numeroSerie, imei1, imei2, concatenacion,
+  setBlock, setNumeroSerie, setImei1, setImei2,
+  
 }: EstadoEquipoProps) {
   return (
     <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
@@ -39,21 +39,6 @@ export default function EstadoEquipo({
             ))}
           </select>
         </div>
-
-        {showDatosEquipos && setDatosEquipos && (
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">DATOS EQUIPOS</label>
-            <select
-              value={datosEquipos}
-              onChange={(e) => setDatosEquipos(e.target.value)}
-              className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-            >
-              {OPCIONES_DATOS_EQUIPOS.map((opcion) => (
-                <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-              ))}
-            </select>
-          </div>
-        )}
 
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">NÚMERO DE SERIE</label>

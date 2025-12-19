@@ -7,6 +7,9 @@ import InventarioModule from './components/modules/InventarioModule';
 import PuntoVentaModule from './components/modules/PuntoVentaModule';
 import PermutaModule from './components/modules/PermutaModule';
 import ReservasModule from './components/modules/ReservasModule';
+import TallerClinicelModule from './components/modules/TallerClinicelModule';
+import StockBodegaModule from './components/modules/StockBodegaModule';
+import TransitoTallerModule from './components/modules/TransitoTallerModule';
 import { ProductoInventario } from './types/producto';
 
 export default function Home() {
@@ -52,6 +55,12 @@ export default function Home() {
         {activeModule === 'permutas' && <PermutaModule />}
         
         {activeModule === 'reservas' && <ReservasModule />}
+        
+        {activeModule === 'taller' && <TallerClinicelModule />}
+        
+        {activeModule === 'bodega' && <StockBodegaModule />}
+        
+        {activeModule === 'transito' && <TransitoTallerModule />}
       </main>
     </div>
   );

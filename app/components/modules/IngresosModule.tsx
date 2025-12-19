@@ -91,7 +91,7 @@ export default function IngresosModule() {
           imei2={form.imei2}
           concatenacion={form.concatenacion}
           setBlock={form.setBlock}
-          setDatosEquipos={form.setDatosEquipos}
+          
           setNumeroSerie={form.setNumeroSerie}
           setImei1={form.setImei1}
           setImei2={form.setImei2}
@@ -101,10 +101,8 @@ export default function IngresosModule() {
         <Inventario
           estado={form.estado}
           fecha={form.fecha}
-          metodoPago={form.metodoPago}
           setEstado={form.setEstado}
           setFecha={form.setFecha}
-          handleMetodoPagoToggle={form.handleMetodoPagoToggle}
         />
 
         {/* Sección 6 - Precios */}
