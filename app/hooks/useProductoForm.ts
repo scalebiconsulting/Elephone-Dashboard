@@ -1,12 +1,26 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ProductoFormState, ProductoFormActions, ProductoData, Persona } from '@/app/types/producto';
+import { ProductoFormState, ProductoFormActions, ProductoData, Persona, PagoProveedor } from '@/app/types/producto';
 import { formatoPesosChilenos, extraerNumero, calcularUtilidad } from '@/app/utils/formatters';
 import { generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
 import { VALORES_INICIALES } from '@/app/constants/opciones';
 
-export interface UseProductoFormReturn extends ProductoFormState, ProductoFormActions {}
+// Valores iniciales para pago proveedor
+const PAGO_PROVEEDOR_INICIAL: PagoProveedor = {
+  estado: 'PENDIENTE',
+  esProrrateado: false,
+  montoEfectivo: 0,
+  montoTransferencia: 0,
+  cuotas: [],
+  totalPagado: 0,
+  saldoPendiente: 0
+};
+
+export interface UseProductoFormReturn extends ProductoFormState, ProductoFormActions {
+  pagoProveedor: PagoProveedor;
+  setPagoProveedor: (pago: PagoProveedor) => void;
+}
 
 export function useProductoForm(): UseProductoFormReturn {
   // Sección 1 - Identificación del Producto
@@ -44,6 +58,9 @@ export function useProductoForm(): UseProductoFormReturn {
   const [estado, setEstado] = useState<string>(VALORES_INICIALES.estado);
   const [fecha, setFecha] = useState('');
   const [metodoPago, setMetodoPago] = useState<string[]>([]);
+
+  // Sección 5.1 - Pago a Proveedor
+  const [pagoProveedor, setPagoProveedor] = useState<PagoProveedor>(PAGO_PROVEEDOR_INICIAL);
 
   // Sección 6 - Precios
   const [repuesto, setRepuesto] = useState('');
@@ -210,6 +227,7 @@ export function useProductoForm(): UseProductoFormReturn {
     setFallaMacOnline(''); setGarantiaCompra(''); setBlock(VALORES_INICIALES.block);
     setImei1(''); setImei2('');
     setEstado(VALORES_INICIALES.estado); setFecha(''); setMetodoPago([]);
+    setPagoProveedor(PAGO_PROVEEDOR_INICIAL);
     setRepuesto(''); setPvpEfectivo(''); setPvpCredito(''); 
     setUtilidad(''); setUtilidad2(''); setTresPorCiento('');
     setCorrelativo(generarCorrelativo());
@@ -251,6 +269,7 @@ export function useProductoForm(): UseProductoFormReturn {
         estado,
         fecha,
         metodoPago,
+        pagoProveedor,
         repuesto: extraerNumero(repuesto),
         pvpEfectivo: extraerNumero(pvpEfectivo),
         pvpCredito: extraerNumero(pvpCredito),
@@ -283,7 +302,7 @@ export function useProductoForm(): UseProductoFormReturn {
     equipo, modelo, color, subModelo, serie, gb, condicion, modelo2, sku,
     condicionBateria, costo, persona, fechaCompra, observacion, fallaMacOnline,
     garantiaCompra, block, datosEquipos, numeroSerie, imei1, imei2, concatenacion,
-    estado, fecha, metodoPago, repuesto, pvpEfectivo, pvpCredito, utilidad,
+    estado, fecha, metodoPago, pagoProveedor, repuesto, pvpEfectivo, pvpCredito, utilidad,
     utilidad2, tresPorCiento, resetForm
   ]);
 
@@ -314,6 +333,7 @@ export function useProductoForm(): UseProductoFormReturn {
     correlativo, sku, condicionBateria, costo, persona, fechaCompra,
     observacion, fallaMacOnline, garantiaCompra, block, datosEquipos,
     numeroSerie, imei1, imei2, concatenacion, estado, fecha, metodoPago,
+    pagoProveedor,
     repuesto, pvpEfectivo, pvpCredito, utilidad, utilidad2, tresPorCiento,
     loading, skuNoEncontrado, buscandoSku,
 
@@ -324,6 +344,7 @@ export function useProductoForm(): UseProductoFormReturn {
     setPersona, setFechaCompra,
     setObservacion, setFallaMacOnline, setGarantiaCompra, setBlock, setDatosEquipos,
     setNumeroSerie, setImei1, setImei2, setEstado, setFecha,
+    setPagoProveedor,
     setRepuesto: handleSetRepuesto,
     setPvpEfectivo: handleSetPvpEfectivo,
     setPvpCredito: handleSetPvpCredito,

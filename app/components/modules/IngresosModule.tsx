@@ -12,6 +12,7 @@ import {
   BasaleExport
 } from '@/app/components/forms/ingresos';
 import SelectorPersona from '@/app/components/forms/shared/SelectorPersona';
+import PagoProveedorSection from '@/app/components/forms/ingresos/PagoProveedorSection';
 
 export default function IngresosModule() {
   const form = useProductoForm();
@@ -70,6 +71,13 @@ export default function IngresosModule() {
           onPersonaChange={form.setPersona}
           roles={['PROVEEDOR']}
           titulo="Datos del Proveedor"
+        />
+
+        {/* Sección 2.2 - Pago a Proveedor */}
+        <PagoProveedorSection
+          costo={form.costo}
+          pagoProveedor={form.pagoProveedor}
+          onChange={form.setPagoProveedor}
         />
 
         {/* Sección 3 - Observaciones */}

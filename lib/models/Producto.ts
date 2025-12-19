@@ -9,6 +9,34 @@ export interface ProveedorData {
   documentos: string[]; // base64 strings
 }
 
+// Interface para cuotas de pago prorrateado
+export interface CuotaPagoSchema {
+  numero: number;
+  monto: number;
+  fechaVencimiento: string;
+  montoEfectivo: number;
+  montoTransferencia: number;
+  referenciaTransferencia?: string;
+  fechaPago?: string;
+  estado: 'PENDIENTE' | 'PAGADO';
+}
+
+// Interface para gestionar el pago al proveedor
+export interface PagoProveedorSchema {
+  estado: 'PAGADO' | 'PENDIENTE' | 'PARCIAL';
+  esProrrateado: boolean;
+  // Para pago inmediato
+  montoEfectivo: number;
+  montoTransferencia: number;
+  referenciaTransferencia?: string;
+  fechaPago?: string;
+  // Para pago prorrateado
+  cuotas: CuotaPagoSchema[];
+  // Totales
+  totalPagado: number;
+  saldoPendiente: number;
+}
+
 export interface Producto {
   _id?: ObjectId;
   // Sección 1 - Identificación
@@ -41,6 +69,8 @@ export interface Producto {
   estado: string;
   fecha: string;
   metodoPago: string[];
+  // Sección 5.1 - Pago a Proveedor
+  pagoProveedor?: PagoProveedorSchema;
   // Sección 6 - Precios
   repuesto: number;
   pvpEfectivo: number;

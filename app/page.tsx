@@ -10,6 +10,7 @@ import ReservasModule from './components/modules/ReservasModule';
 import TallerClinicelModule from './components/modules/TallerClinicelModule';
 import StockBodegaModule from './components/modules/StockBodegaModule';
 import TransitoTallerModule from './components/modules/TransitoTallerModule';
+import CuentasPorPagarModule from './components/modules/CuentasPorPagarModule';
 import { ProductoInventario } from './types/producto';
 
 export default function Home() {
@@ -55,6 +56,8 @@ export default function Home() {
         {activeModule === 'permutas' && <PermutaModule />}
         
         {activeModule === 'reservas' && <ReservasModule />}
+        
+        {activeModule === 'cuentas' && <CuentasPorPagarModule />}
         
         {activeModule === 'taller' && <TallerClinicelModule />}
         

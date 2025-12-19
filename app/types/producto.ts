@@ -5,6 +5,38 @@ import type { Persona } from '@/lib/models/Persona';
 // Re-exportar Persona desde el modelo central (evita duplicación)
 export type { Persona };
 
+// Interface para cuotas de pago prorrateado
+export interface CuotaPago {
+  numero: number;
+  monto: number;
+  fechaVencimiento: string;
+  // Pago de la cuota (puede ser mixto efectivo + transferencia)
+  montoEfectivo: number;
+  montoTransferencia: number;
+  referenciaTransferencia?: string;
+  fechaPago?: string;
+  estado: 'PENDIENTE' | 'PAGADO';
+}
+
+// Interface para gestionar el pago al proveedor
+export interface PagoProveedor {
+  estado: 'PAGADO' | 'PENDIENTE' | 'PARCIAL';
+  esProrrateado: boolean;
+  
+  // Para pago inmediato (no prorrateado)
+  montoEfectivo: number;
+  montoTransferencia: number;
+  referenciaTransferencia?: string;
+  fechaPago?: string;
+  
+  // Para pago prorrateado
+  cuotas: CuotaPago[];
+  
+  // Totales calculados
+  totalPagado: number;
+  saldoPendiente: number;
+}
+
 // Interface para producto del inventario (desde BD)
 export interface ProductoInventario {
   _id: string;
@@ -39,6 +71,7 @@ export interface ProductoInventario {
   metodoPago: string[];
   repuesto: number;
   tresPorCiento: number;
+  pagoProveedor?: PagoProveedor;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -159,6 +192,7 @@ export interface ProductoData {
   utilidad: number;
   utilidad2: number;
   tresPorCiento: number;
+  pagoProveedor?: PagoProveedor;
 }
 
 // Interface para ventas

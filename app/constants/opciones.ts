@@ -50,6 +50,16 @@ export const ESTADOS_RESERVA = [
   { value: 'CANCELADA', label: 'Cancelada', color: 'bg-red-500' },
 ] as const;
 
+// Estados de pago al proveedor
+export const ESTADOS_PAGO_PROVEEDOR = [
+  { value: 'PAGADO', label: 'Pagado', color: 'bg-green-500' },
+  { value: 'PENDIENTE', label: 'Pendiente', color: 'bg-yellow-500' },
+  { value: 'PARCIAL', label: 'Pago Parcial', color: 'bg-orange-500' },
+] as const;
+
+// Métodos de pago al proveedor (solo efectivo y transferencia)
+export const METODOS_PAGO_PROVEEDOR = ['EFECTIVO', 'TRANSFERENCIA'] as const;
+
 // Valores por defecto del formulario
 export const VALORES_INICIALES = {
   estado: '',
