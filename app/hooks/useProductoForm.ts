@@ -71,6 +71,26 @@ export function useProductoForm(): UseProductoFormReturn {
     }
   }, [equipo]);
 
+  // Limpiar modelo cuando cambia la serie (para iPhone)
+  useEffect(() => {
+    if (equipo === 'IPHONE' && serie) {
+      setModelo('');
+    }
+  }, [serie, equipo]);
+
+  // Limpiar gama (subModelo) cuando cambia el modelo (para Apple Watch y Accesorio)
+  // Para Accesorio también limpiar serie y color ya que dependen del modelo
+  useEffect(() => {
+    if (equipo === 'APPLE WATCH' && modelo) {
+      setSubModelo('');
+    }
+    if (equipo === 'ACCESORIO' && modelo) {
+      setSubModelo('');
+      setSerie('');
+      setColor('');
+    }
+  }, [modelo, equipo]);
+
   // Generar MODELO2 dinámicamente según tipo de equipo
   useEffect(() => {
     setModelo2(generarModelo2(equipo, serie, modelo, subModelo, gb, color, condicion));

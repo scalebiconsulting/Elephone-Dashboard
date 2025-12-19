@@ -24,6 +24,78 @@ interface IdentificacionProductoProps {
 // Tipos de campo disponibles
 type CampoTipo = 'SERIE' | 'MODELO' | 'SUB_MODELO' | 'GB' | 'COLOR' | 'CONDICION';
 
+// Opciones de serie para iPhone
+const SERIES_IPHONE = ['11', '12', '13', '14', '15', '16', '17', 'AIR', 'SE', 'XR'];
+
+// Modelos disponibles por serie
+const MODELOS_POR_SERIE: Record<string, string[]> = {
+  '11': ['PRO', 'PRO MAX'],
+  '17': ['PRO', 'PRO MAX'],
+  '12': ['MINI', 'PRO', 'PRO MAX'],
+  '13': ['MINI', 'PRO', 'PRO MAX'],
+  '14': ['PLUS', 'PRO', 'PRO MAX'],
+  '15': ['PLUS', 'PRO', 'PRO MAX'],
+  '16': ['PLUS', 'PRO', 'PRO MAX'],
+  'AIR': [],
+  'SE': [],
+  'XR': [],
+};
+
+// Opciones de modelo para Apple Watch
+const MODELOS_APPLE_WATCH = ['1 GENERACION', '2022', '2023'];
+
+// Gamas disponibles por modelo de Apple Watch
+const GAMAS_POR_MODELO: Record<string, string[]> = {
+  '1 GENERACION': ['BASICO', 'EDITION', 'SPORT'],
+  '2022': ['ULTRA'],
+  '2023': ['ULTRA'],
+};
+
+// Opciones de modelo para Accesorio
+const MODELOS_ACCESORIO = [
+  'FASHION', 'FASHIONCASE', 'IPEFET', 'MAGNETIC',
+  'PHONECASE', 'SPACE', 'MAGSAFE', 'SILICONE CASE', 'MOTOMO'
+];
+
+// Gamas disponibles por modelo de Accesorio
+const GAMAS_POR_MODELO_ACCESORIO: Record<string, string[]> = {
+  'FASHION': ['PRO', 'PRO MAX'],
+  'FASHIONCASE': ['BASICO'],
+  'IPEFET': ['BASICO', 'PRO'],
+  'MAGNETIC': ['BASICO', 'PLUS', 'PRO', 'PRO MAX'],
+  'PHONECASE': ['BASICO', 'PLUS', 'PRO', 'PRO MAX'],
+  'SPACE': ['BASICO', 'PLUS', 'PRO', 'PRO MAX'],
+  'MAGSAFE': ['BASICO', 'BASICO / PRO', 'PLUS', 'PRO', 'PRO MAX'],
+  'SILICONE CASE': ['BASICO', 'BASICO / PRO', 'PLUS', 'PRO', 'PRO MAX'],
+  'MOTOMO': ['PRO'],
+};
+
+// Series disponibles por modelo de Accesorio
+const SERIES_POR_MODELO_ACCESORIO: Record<string, string[]> = {
+  'FASHION': ['11', '13', '15'],
+  'FASHIONCASE': ['11', '12', '13', '14'],
+  'IPEFET': ['12', '14', '15'],
+  'MAGNETIC': ['12', '13', '14', '15'],
+  'PHONECASE': ['12', '13', '14', '15'],
+  'SPACE': ['12', '13', '14', '15'],
+  'MAGSAFE': ['11', '12', '13', '14', '15', 'XR'],
+  'SILICONE CASE': ['11', '12', '13', '14', '15', 'XR'],
+  'MOTOMO': ['13', '14'],
+};
+
+// Colores disponibles por modelo de Accesorio
+const COLORES_POR_MODELO_ACCESORIO: Record<string, string[]> = {
+  'FASHION': ['TRASPARENTE'],
+  'FASHIONCASE': ['AZUL', 'DORADO', 'MORADO', 'PLATEADO', 'ROSA'],
+  'IPEFET': ['AZUL OSCURO', 'NEGRO'],
+  'MAGNETIC': ['AZUL', 'MORADO', 'MORADO CLARO', 'MORADO OSCURO', 'NEGRO', 'PIEL', 'ROSA', 'TRASPARENTE', 'VERDE', 'VERDE OSCURO'],
+  'PHONECASE': ['AZUL', 'MORADO', 'MORADO CLARO', 'MORADO OSCURO', 'NEGRO', 'PIEL', 'ROSA', 'TRASPARENTE', 'VERDE', 'VERDE OSCURO'],
+  'SPACE': ['AZUL', 'MORADO', 'MORADO CLARO', 'MORADO OSCURO', 'NEGRO', 'PIEL', 'ROSA', 'TRASPARENTE', 'VERDE', 'VERDE OSCURO'],
+  'MAGSAFE': ['AZUL', 'AZUL CLARO', 'AZUL MARINO', 'AZUL OSCURO', 'AZUL REY', 'BLANCO', 'CALIPSO', 'CORAL', 'FUCSIA', 'GRIS', 'MARRON', 'MORADO', 'MORADO CLARO', 'MORADO OSCURO', 'MULTICOLOR', 'NARANJA', 'NEGRO', 'PIEL', 'ROJO', 'ROSA', 'TRASPARENTE', 'VERDE', 'VERDE CLARO', 'VERDE OSCURO', 'VINOTINTO'],
+  'SILICONE CASE': ['AZUL', 'AZUL CLARO', 'AZUL MARINO', 'AZUL OSCURO', 'AZUL REY', 'BLANCO', 'CALIPSO', 'CORAL', 'FUCSIA', 'GRIS', 'MARRON', 'MORADO', 'MORADO CLARO', 'MORADO OSCURO', 'MULTICOLOR', 'NARANJA', 'NEGRO', 'PIEL', 'ROJO', 'ROSA', 'TRASPARENTE', 'VERDE', 'VERDE CLARO', 'VERDE OSCURO', 'VINOTINTO'],
+  'MOTOMO': ['AZUL', 'AZUL OSCURO', 'ROJO', 'ROSA', 'VERDE FLORECENTE', 'VINOTINTO'],
+};
+
 // Configuración de campos por tipo de producto (en orden)
 const CAMPOS_POR_TIPO: Record<string, CampoTipo[]> = {
   'IPHONE': ['SERIE', 'MODELO', 'GB', 'COLOR', 'CONDICION'],
@@ -44,6 +116,48 @@ export default function IdentificacionProducto({
   const renderCampo = (campo: CampoTipo) => {
     switch (campo) {
       case 'SERIE':
+        // Para iPhone: select con opciones, para otros: input libre
+        if (equipo === 'IPHONE') {
+          return (
+            <div key="serie">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                SERIE
+              </label>
+              <select
+                value={serie}
+                onChange={(e) => setSerie(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+              >
+                <option value="">Seleccionar...</option>
+                {SERIES_IPHONE.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para Accesorio: select con series según modelo
+        if (equipo === 'ACCESORIO') {
+          const seriesAccesorio = SERIES_POR_MODELO_ACCESORIO[modelo] || [];
+          return (
+            <div key="serie">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                SERIE
+              </label>
+              <select
+                value={serie}
+                onChange={(e) => setSerie(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                disabled={!modelo}
+              >
+                <option value="">Seleccionar</option>
+                {seriesAccesorio.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
         return (
           <div key="serie">
             <label className="block text-sm font-medium text-slate-400 mb-2">
@@ -62,6 +176,72 @@ export default function IdentificacionProducto({
         );
       
       case 'MODELO':
+        // Para iPhone, mostrar select basado en la serie seleccionada
+        if (equipo === 'IPHONE') {
+          const modelosDisponibles = MODELOS_POR_SERIE[serie] || [];
+          // Si la serie no tiene modelos (AIR, SE, XR), no mostrar el campo
+          if (modelosDisponibles.length === 0) {
+            return null;
+          }
+          return (
+            <div key="modelo">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                MODELO
+              </label>
+              <select
+                value={modelo}
+                onChange={(e) => setModelo(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+              >
+                <option value="">Seleccionar</option>
+                {modelosDisponibles.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para Apple Watch, mostrar select con modelos disponibles
+        if (equipo === 'APPLE WATCH') {
+          return (
+            <div key="modelo">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                MODELO
+              </label>
+              <select
+                value={modelo}
+                onChange={(e) => setModelo(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+              >
+                <option value="">Seleccionar</option>
+                {MODELOS_APPLE_WATCH.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para Accesorio, mostrar select con modelos disponibles
+        if (equipo === 'ACCESORIO') {
+          return (
+            <div key="modelo">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                MODELO
+              </label>
+              <select
+                value={modelo}
+                onChange={(e) => setModelo(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+              >
+                <option value="">Seleccionar</option>
+                {MODELOS_ACCESORIO.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para otros equipos, input de texto
         return (
           <div key="modelo">
             <label className="block text-sm font-medium text-slate-400 mb-2">
@@ -80,6 +260,51 @@ export default function IdentificacionProducto({
         );
       
       case 'SUB_MODELO':
+        // Para Apple Watch, mostrar select con gamas según modelo seleccionado
+        if (equipo === 'APPLE WATCH') {
+          const gamasDisponibles = GAMAS_POR_MODELO[modelo] || [];
+          return (
+            <div key="subModelo">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                GAMA
+              </label>
+              <select
+                value={subModelo}
+                onChange={(e) => setSubModelo(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                disabled={!modelo}
+              >
+                <option value="">Seleccionar</option>
+                {gamasDisponibles.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para Accesorio, mostrar select con gamas según modelo seleccionado
+        if (equipo === 'ACCESORIO') {
+          const gamasAccesorio = GAMAS_POR_MODELO_ACCESORIO[modelo] || [];
+          return (
+            <div key="subModelo">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                GAMA
+              </label>
+              <select
+                value={subModelo}
+                onChange={(e) => setSubModelo(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                disabled={!modelo}
+              >
+                <option value="">Seleccionar</option>
+                {gamasAccesorio.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para otros equipos, input de texto
         return (
           <div key="subModelo">
             <label className="block text-sm font-medium text-slate-400 mb-2">
@@ -124,6 +349,29 @@ export default function IdentificacionProducto({
         );
       
       case 'COLOR':
+        // Para Accesorio: select con colores según modelo
+        if (equipo === 'ACCESORIO') {
+          const coloresAccesorio = COLORES_POR_MODELO_ACCESORIO[modelo] || [];
+          return (
+            <div key="color">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                COLOR
+              </label>
+              <select
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                disabled={!modelo}
+              >
+                <option value="">Seleccionar</option>
+                {coloresAccesorio.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        // Para otros equipos: input de texto
         return (
           <div key="color">
             <label className="block text-sm font-medium text-slate-400 mb-2">

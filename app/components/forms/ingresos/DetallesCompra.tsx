@@ -39,7 +39,6 @@ export default function DetallesCompra({
                     ? 'border-red-500 text-red-400' 
                     : 'border-[#0ea5e9] text-white'
               }`}
-              placeholder="IPH11-BA-MO64NU00001"
             />
             {buscandoSku && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -70,7 +69,6 @@ export default function DetallesCompra({
             }}
             required
             className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            placeholder="100"
           />
         </div>
 
