@@ -130,15 +130,15 @@ export default function FormularioProductoPermuta({
 
       {/* Sección 6 - Precios (con valor de permuta, sin utilidades) */}
       <PreciosUtilidad
-        repuesto={productoPermuta.repuesto}
+       
         pvpEfectivo={productoPermuta.pvpEfectivo}
         pvpCredito={productoPermuta.pvpCredito}
         valorPermuta={productoPermuta.valorPermuta}
-        setRepuesto={(v) => handleMoneyChange('repuesto', v)}
+        
         setPvpEfectivo={(v) => handleMoneyChange('pvpEfectivo', v)}
         setPvpCredito={(v) => handleMoneyChange('pvpCredito', v)}
         setValorPermuta={handleValorPermutaChange}
-        showRepuesto={true}
+        
         showUtilidades={false}
         showValorPermuta={true}
       />

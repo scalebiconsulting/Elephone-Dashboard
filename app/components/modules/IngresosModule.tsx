@@ -66,18 +66,20 @@ export default function IngresosModule() {
           setFechaCompra={form.setFechaCompra}
         />
 
-        {/* Sección 2.1 - Selector de Tipo de Proveedor */}
-        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Tipo de Proveedor</h2>
-          <select
-            value={form.tipoProveedor}
-            onChange={(e) => form.setTipoProveedor(e.target.value as 'PERSONA' | 'EMPRESA')}
-            className="w-64 px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9] text-lg"
-          >
-            <option value="PERSONA">👤 Persona Natural</option>
-            <option value="EMPRESA">🏢 Empresa</option>
-          </select>
-        </div>
+        {/* Sección 2.1 - Selector de Tipo de Proveedor - Solo si no hay proveedor seleccionado */}
+        {!form.persona?._id && !form.empresa?._id && (
+          <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+            <h2 className="text-xl font-bold text-white mb-4">Tipo de Proveedor</h2>
+            <select
+              value={form.tipoProveedor}
+              onChange={(e) => form.setTipoProveedor(e.target.value as 'PERSONA' | 'EMPRESA')}
+              className="w-64 px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9] text-lg"
+            >
+              <option value="PERSONA">👤 Persona Natural</option>
+              <option value="EMPRESA">🏢 Empresa</option>
+            </select>
+          </div>
+        )}
 
         {/* Sección 2.2 - Datos del Proveedor (Persona o Empresa) */}
         {form.tipoProveedor === 'PERSONA' ? (
@@ -100,16 +102,13 @@ export default function IngresosModule() {
           costo={form.costo}
           pagoProveedor={form.pagoProveedor}
           onChange={form.setPagoProveedor}
+          tipoProveedor={form.tipoProveedor}
         />
 
         {/* Sección 3 - Observaciones */}
         <Observaciones
           observacion={form.observacion}
-          fallaMacOnline={form.fallaMacOnline}
-          garantiaCompra={form.garantiaCompra}
           setObservacion={form.setObservacion}
-          setFallaMacOnline={form.setFallaMacOnline}
-          setGarantiaCompra={form.setGarantiaCompra}
         />
 
         {/* Sección 4 - Estado del Equipo */}
@@ -137,16 +136,14 @@ export default function IngresosModule() {
 
         {/* Sección 6 - Precios */}
         <PreciosUtilidad
-          repuesto={form.repuesto}
+          
           pvpEfectivo={form.pvpEfectivo}
           pvpCredito={form.pvpCredito}
           utilidad={form.utilidad}
           utilidad2={form.utilidad2}
-          tresPorCiento={form.tresPorCiento}
-          setRepuesto={form.setRepuesto}
           setPvpEfectivo={form.setPvpEfectivo}
           setPvpCredito={form.setPvpCredito}
-          setTresPorCiento={form.setTresPorCiento}
+         
         />
 
         {/* Sección 7 - Exportar a Basale */}

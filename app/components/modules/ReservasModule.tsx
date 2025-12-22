@@ -12,13 +12,12 @@ export default function ReservasModule() {
     reservas,
     loading,
     formulario,
-    proveedor,
+   
     cliente,
     editandoId,
     contadores,
     updateFormulario,
     handleMoneyChange,
-    setProveedor,
     setCliente,
     resetFormulario,
     crearReserva,
@@ -135,16 +134,7 @@ export default function ReservasModule() {
           </div>
         </div>
 
-        {/* Sección Proveedor */}
-        <div className="mb-6">
-          <SelectorPersona
-            persona={proveedor}
-            onPersonaChange={setProveedor}
-            roles={['PROVEEDOR']}
-            titulo="Datos del Proveedor (Origen del Producto)"
-            showDocumentos={false}
-          />
-        </div>
+       
 
         {/* Sección Cliente */}
         <div className="mb-6">

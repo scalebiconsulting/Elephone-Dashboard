@@ -14,14 +14,18 @@ interface PagoProveedorSectionProps {
   costo: string;
   pagoProveedor: PagoProveedor;
   onChange: (pagoProveedor: PagoProveedor) => void;
+  tipoProveedor?: 'PERSONA' | 'EMPRESA';
 }
 
 export default function PagoProveedorSection({
   costo,
   pagoProveedor,
-  onChange
+  onChange,
+  tipoProveedor = 'PERSONA'
 }: PagoProveedorSectionProps) {
-  const costoNumerico = parseFloat(costo) || 0;
+  // Limpiar el costo de cualquier formato y convertir a número
+  const costoLimpio = costo.replace(/[^0-9]/g, '');
+  const costoNumerico = parseInt(costoLimpio) || 0;
   
   // Estado local para el formulario
   const [esProrrateado, setEsProrrateado] = useState(pagoProveedor.esProrrateado);
@@ -46,7 +50,7 @@ export default function PagoProveedorSection({
 
   // Generar cuotas iniciales con montos distribuidos
   const generarCuotasIniciales = useCallback((cantidad: number): CuotaFormulario[] => {
-    const montoPorCuota = costoNumerico / cantidad;
+    const montoPorCuota = Math.round(costoNumerico / cantidad);
     const nuevasCuotas: CuotaFormulario[] = [];
     const hoy = new Date();
     
@@ -56,7 +60,7 @@ export default function PagoProveedorSection({
       
       nuevasCuotas.push({
         numero: i + 1,
-        monto: montoPorCuota.toFixed(2),
+        monto: montoPorCuota.toString(),
         fechaVencimiento: fechaVenc.toISOString().split('T')[0]
       });
     }
@@ -96,21 +100,20 @@ export default function PagoProveedorSection({
   // Calcular totales
   const calcularTotales = useCallback(() => {
     if (esProrrateado) {
-      const totalCuotas = cuotasForm.reduce((sum, c) => sum + (parseFloat(c.monto) || 0), 0);
       return {
         totalPagado: 0,
-        saldoPendiente: totalCuotas
+        saldoPendiente: Math.round(costoNumerico)
       };
     } else {
-      const efectivo = parseFloat(montoEfectivo) || 0;
-      const transferencia = parseFloat(montoTransferencia) || 0;
+      const efectivo = Math.round(parseFloat(montoEfectivo) || 0);
+      const transferencia = Math.round(parseFloat(montoTransferencia) || 0);
       const totalPagado = efectivo + transferencia;
       return {
         totalPagado,
-        saldoPendiente: costoNumerico - totalPagado
+        saldoPendiente: Math.round(costoNumerico - totalPagado)
       };
     }
-  }, [esProrrateado, cuotasForm, montoEfectivo, montoTransferencia, costoNumerico]);
+  }, [esProrrateado, montoEfectivo, montoTransferencia, costoNumerico]);
 
   // Determinar estado del pago
   const determinarEstado = useCallback((): 'PAGADO' | 'PENDIENTE' | 'PARCIAL' => {
@@ -132,13 +135,13 @@ export default function PagoProveedorSection({
     const nuevoPago: PagoProveedor = {
       estado: determinarEstado(),
       esProrrateado,
-      montoEfectivo: esProrrateado ? 0 : (parseFloat(montoEfectivo) || 0),
-      montoTransferencia: esProrrateado ? 0 : (parseFloat(montoTransferencia) || 0),
+      montoEfectivo: esProrrateado ? 0 : Math.round(parseFloat(montoEfectivo) || 0),
+      montoTransferencia: esProrrateado ? 0 : Math.round(parseFloat(montoTransferencia) || 0),
       referenciaTransferencia: esProrrateado ? undefined : (referenciaTransferencia || undefined),
       fechaPago: esProrrateado ? undefined : (fechaPago || undefined),
       cuotas: esProrrateado ? cuotasForm.map(c => ({
         numero: c.numero,
-        monto: parseFloat(c.monto) || 0,
+        monto: Math.round(parseFloat(c.monto) || 0),
         fechaVencimiento: c.fechaVencimiento,
         montoEfectivo: 0,
         montoTransferencia: 0,
@@ -168,32 +171,34 @@ export default function PagoProveedorSection({
         </div>
       </div>
 
-      {/* Toggle Prorrateado */}
-      <div className="mb-6">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <div className={`relative w-14 h-7 rounded-full transition-colors ${
-            esProrrateado ? 'bg-blue-600' : 'bg-slate-600'
-          }`}>
-            <input
-              type="checkbox"
-              checked={esProrrateado}
-              onChange={(e) => handleProrrateadoToggle(e.target.checked)}
-              className="sr-only"
-            />
-            <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${
-              esProrrateado ? 'translate-x-8' : 'translate-x-1'
-            }`} />
+      {/* Toggle Prorrateado - Solo para Empresas */}
+      {tipoProveedor === 'EMPRESA' && (
+        <div className="mb-6">
+          <div className="flex items-center gap-3">
+            <label className={`relative w-14 h-7 rounded-full transition-colors cursor-pointer ${
+              esProrrateado ? 'bg-blue-600' : 'bg-slate-600'
+            }`}>
+              <input
+                type="checkbox"
+                checked={esProrrateado}
+                onChange={(e) => handleProrrateadoToggle(e.target.checked)}
+                className="sr-only"
+              />
+              <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${
+                esProrrateado ? 'translate-x-8' : 'translate-x-1'
+              }`} />
+            </label>
+            <span className="text-white font-medium">
+              Pago Prorrateado (Cuotas)
+            </span>
           </div>
-          <span className="text-white font-medium">
-            Pago Prorrateado (Cuotas)
-          </span>
-        </label>
-        <p className="text-slate-400 text-sm mt-1 ml-17">
-          {esProrrateado 
-            ? 'El pago se dividirá en cuotas con fechas de vencimiento' 
-            : 'Pago inmediato (puede ser mixto: efectivo + transferencia)'}
-        </p>
-      </div>
+          <p className="text-slate-400 text-sm mt-1 ml-17">
+            {esProrrateado 
+              ? 'El pago se dividirá en cuotas con fechas de vencimiento' 
+              : 'Pago inmediato (puede ser mixto: efectivo + transferencia)'}
+          </p>
+        </div>
+      )}
 
       {!esProrrateado ? (
         /* Pago Inmediato */
@@ -204,15 +209,21 @@ export default function PagoProveedorSection({
               <label className="block text-sm font-medium text-slate-400 mb-2">
                 💵 Monto Efectivo
               </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={montoEfectivo}
-                onChange={(e) => setMontoEfectivo(e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] text-white rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                placeholder="0.00"
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
+                  $
+                </span>
+                <input
+                  type="text"
+                  value={montoEfectivo ? parseInt(montoEfectivo).toLocaleString('es-CL') : ''}
+                  onChange={(e) => {
+                    const valor = e.target.value.replace(/\D/g, '');
+                    setMontoEfectivo(valor);
+                  }}
+                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border border-[#334155] text-white rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="0"
+                />
+              </div>
             </div>
 
             {/* Monto Transferencia */}
@@ -220,15 +231,21 @@ export default function PagoProveedorSection({
               <label className="block text-sm font-medium text-slate-400 mb-2">
                 🏦 Monto Transferencia
               </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={montoTransferencia}
-                onChange={(e) => setMontoTransferencia(e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="0.00"
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white font-medium pointer-events-none">
+                  $
+                </span>
+                <input
+                  type="text"
+                  value={montoTransferencia ? parseInt(montoTransferencia).toLocaleString('es-CL') : ''}
+                  onChange={(e) => {
+                    const valor = e.target.value.replace(/\D/g, '');
+                    setMontoTransferencia(valor);
+                  }}
+                  className="w-full px-4 py-3 pl-8 bg-[#0f172a] border border-[#334155] text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="0"
+                />
+              </div>
             </div>
 
             {/* Referencia Transferencia */}
@@ -263,16 +280,16 @@ export default function PagoProveedorSection({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
                 <p className="text-slate-400 text-sm">Costo Total</p>
-                <p className="text-white font-bold text-lg">${costoNumerico.toFixed(2)}</p>
+                <p className="text-white font-bold text-lg">${costoNumerico.toLocaleString('es-CL')}</p>
               </div>
               <div>
                 <p className="text-slate-400 text-sm">Total Pagado</p>
-                <p className="text-green-400 font-bold text-lg">${totalPagado.toFixed(2)}</p>
+                <p className="text-green-400 font-bold text-lg">${Math.round(totalPagado).toLocaleString('es-CL')}</p>
               </div>
               <div>
                 <p className="text-slate-400 text-sm">Saldo Pendiente</p>
                 <p className={`font-bold text-lg ${saldoPendiente > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                  ${saldoPendiente.toFixed(2)}
+                  ${Math.round(saldoPendiente).toLocaleString('es-CL')}
                 </p>
               </div>
               <div>
@@ -329,7 +346,7 @@ export default function PagoProveedorSection({
                 <div className="col-span-4">
                   <input
                     type="number"
-                    step="0.01"
+                    step="1"
                     min="0"
                     value={cuota.monto}
                     onChange={(e) => handleMontoCuotaChange(index, e.target.value)}
@@ -358,26 +375,26 @@ export default function PagoProveedorSection({
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-slate-400 text-sm">Costo Total</p>
-                <p className="text-white font-bold text-lg">${costoNumerico.toFixed(2)}</p>
+                <p className="text-white font-bold text-lg">${costoNumerico.toLocaleString('es-CL')}</p>
               </div>
               <div>
                 <p className="text-slate-400 text-sm">Total Cuotas</p>
                 <p className={`font-bold text-lg ${
-                  Math.abs(saldoPendiente - costoNumerico) < 0.01 ? 'text-green-400' : 'text-yellow-400'
+                  cuotasForm.reduce((sum, c) => sum + (Math.round(parseFloat(c.monto) || 0)), 0) === Math.round(costoNumerico) ? 'text-green-400' : 'text-yellow-400'
                 }`}>
-                  ${saldoPendiente.toFixed(2)}
+                  ${cuotasForm.reduce((sum, c) => sum + (Math.round(parseFloat(c.monto) || 0)), 0).toLocaleString('es-CL')}
                 </p>
               </div>
               <div>
                 <p className="text-slate-400 text-sm">Diferencia</p>
                 <p className={`font-bold text-lg ${
-                  Math.abs(saldoPendiente - costoNumerico) < 0.01 ? 'text-green-400' : 'text-red-400'
+                  cuotasForm.reduce((sum, c) => sum + (Math.round(parseFloat(c.monto) || 0)), 0) === Math.round(costoNumerico) ? 'text-green-400' : 'text-red-400'
                 }`}>
-                  ${(saldoPendiente - costoNumerico).toFixed(2)}
+                  ${(cuotasForm.reduce((sum, c) => sum + (Math.round(parseFloat(c.monto) || 0)), 0) - Math.round(costoNumerico)).toLocaleString('es-CL')}
                 </p>
               </div>
             </div>
-            {Math.abs(saldoPendiente - costoNumerico) >= 0.01 && (
+            {cuotasForm.reduce((sum, c) => sum + (Math.round(parseFloat(c.monto) || 0)), 0) !== Math.round(costoNumerico) && (
               <p className="text-yellow-400 text-sm text-center mt-2">
                 ⚠️ La suma de las cuotas no coincide con el costo total
               </p>

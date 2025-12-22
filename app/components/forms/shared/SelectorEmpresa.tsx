@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Building2, X, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, Check, Building2, Loader2, CheckCircle2 } from 'lucide-react';
 import { Empresa } from '@/lib/models/Empresa';
 
 interface SelectorEmpresaProps {
@@ -24,75 +24,59 @@ export default function SelectorEmpresa({
   onEmpresaChange,
   titulo = 'Datos de la Empresa',
 }: SelectorEmpresaProps) {
-  const [busqueda, setBusqueda] = useState('');
-  const [resultados, setResultados] = useState<Empresa[]>([]);
-  const [buscando, setBuscando] = useState(false);
-  const [mostrarResultados, setMostrarResultados] = useState(false);
-  const [modoCrear, setModoCrear] = useState(true);
   const [nuevaEmpresa, setNuevaEmpresa] = useState<Empresa>(EMPRESA_VACIA);
   const [guardando, setGuardando] = useState(false);
-  
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [buscandoRut, setBuscandoRut] = useState(false);
+  const [rutEncontrado, setRutEncontrado] = useState(false);
 
-  // Buscar empresas
-  const buscarEmpresas = useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setResultados([]);
+  // Buscar empresa por RUT
+  const buscarPorRut = useCallback(async (rut: string) => {
+    if (rut.length < 8) {
+      setRutEncontrado(false);
       return;
     }
 
-    setBuscando(true);
+    setBuscandoRut(true);
     try {
-      const response = await fetch(`/api/empresas?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/empresas?q=${encodeURIComponent(rut)}`);
       if (response.ok) {
         const data = await response.json();
-        setResultados(data);
-        setMostrarResultados(true);
+        const empresaEncontrada = data.find((e: Empresa) => 
+          e.rut?.replace(/[.-]/g, '') === rut.replace(/[.-]/g, '')
+        );
+        
+        if (empresaEncontrada) {
+          // Limpiar documentos de búsquedas anteriores
+          setNuevaEmpresa({ ...empresaEncontrada, documentos: [] });
+          setRutEncontrado(true);
+        } else {
+          setRutEncontrado(false);
+        }
       }
     } catch (error) {
-      console.error('Error al buscar empresas:', error);
+      console.error('Error al buscar por RUT:', error);
+      setRutEncontrado(false);
     } finally {
-      setBuscando(false);
+      setBuscandoRut(false);
     }
   }, []);
 
-  // Debounce para búsqueda
+  // Debounce para búsqueda por RUT
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (busqueda && !empresa) {
-        buscarEmpresas(busqueda);
+      if (nuevaEmpresa.rut && !empresa) {
+        buscarPorRut(nuevaEmpresa.rut);
       }
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timer);
-  }, [busqueda, empresa, buscarEmpresas]);
-
-  // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setMostrarResultados(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Seleccionar empresa existente
-  const seleccionarEmpresa = (e: Empresa) => {
-    onEmpresaChange(e);
-    setBusqueda('');
-    setMostrarResultados(false);
-    setModoCrear(false);
-  };
+  }, [nuevaEmpresa.rut, empresa, buscarPorRut]);
 
   // Limpiar selección
   const limpiarSeleccion = () => {
     onEmpresaChange(null);
-    setBusqueda('');
     setNuevaEmpresa(EMPRESA_VACIA);
+    setRutEncontrado(false);
   };
 
   // Crear nueva empresa
@@ -118,8 +102,8 @@ export default function SelectorEmpresa({
       if (response.ok) {
         const data = await response.json();
         onEmpresaChange(data.data);
-        setModoCrear(false);
         setNuevaEmpresa(EMPRESA_VACIA);
+        setRutEncontrado(false);
       }
     } catch (error) {
       console.error('Error al crear empresa:', error);
@@ -142,7 +126,7 @@ export default function SelectorEmpresa({
 
       {/* Empresa seleccionada */}
       {empresa && empresa._id ? (
-        <div className="bg-[#0f172a] border border-[#10b981] rounded-lg p-4">
+        <div className="bg-[#0f172a] border border-[#10b981] rounded-lg p-4 max-w-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-[#10b981] rounded-full flex items-center justify-center">
@@ -172,10 +156,38 @@ export default function SelectorEmpresa({
             </button>
           </div>
         </div>
-      ) : modoCrear ? (
-        /* Formulario para crear nueva empresa */
+      ) : (
+        /* Formulario para crear/editar empresa */
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                RUT <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={nuevaEmpresa.rut}
+                  onChange={(e) => updateNuevaEmpresa('rut', e.target.value)}
+                  className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#10b981]"
+                  placeholder="12345678-9"
+                  maxLength={12}
+                />
+                {buscandoRut && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 size={18} className="text-[#10b981] animate-spin" />
+                  </div>
+                )}
+                {!buscandoRut && rutEncontrado && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CheckCircle2 size={18} className="text-green-400" />
+                  </div>
+                )}
+              </div>
+              {rutEncontrado && (
+                <p className="text-green-400 text-xs mt-1">✓ Empresa encontrada en base de datos</p>
+              )}
+            </div>
             <div className="md:col-span-1">
               <label className="block text-sm font-medium text-slate-400 mb-2">
                 RAZÓN SOCIAL <span className="text-red-500">*</span>
@@ -186,19 +198,6 @@ export default function SelectorEmpresa({
                 onChange={(e) => updateNuevaEmpresa('razonSocial', e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#10b981]"
                 placeholder="RAZÓN SOCIAL DE LA EMPRESA"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                RUT <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={nuevaEmpresa.rut}
-                onChange={(e) => updateNuevaEmpresa('rut', e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#10b981]"
-                placeholder="12345678-9"
-                maxLength={12}
               />
             </div>
             <div>
@@ -249,14 +248,13 @@ export default function SelectorEmpresa({
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={() => {
-                setModoCrear(false);
-                setNuevaEmpresa(EMPRESA_VACIA);
+                limpiarSeleccion();
               }}
-              className="flex-1 px-4 py-3 bg-[#334155] hover:bg-[#475569] text-white rounded-lg transition-colors"
+              className="px-4 py-2 bg-[#334155] hover:bg-[#475569] text-white rounded-lg transition-colors text-sm"
             >
               Cancelar
             </button>
@@ -264,78 +262,12 @@ export default function SelectorEmpresa({
               type="button"
               onClick={crearEmpresa}
               disabled={guardando || !nuevaEmpresa.razonSocial || !nuevaEmpresa.rut || !nuevaEmpresa.telefono}
-              className="flex-1 px-4 py-3 bg-[#10b981] hover:bg-[#059669] text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="px-4 py-2 bg-[#10b981] hover:bg-[#059669] text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
             >
-              <Check size={18} />
+              <Check size={16} />
               {guardando ? 'Guardando...' : 'Guardar Empresa'}
             </button>
           </div>
-        </div>
-      ) : (
-        /* Buscador de empresas */
-        <div className="relative" ref={dropdownRef}>
-          <div className="relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              onFocus={() => busqueda.length >= 2 && setMostrarResultados(true)}
-              className="w-full pl-12 pr-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#10b981]"
-              placeholder="Buscar por razón social, RUT o teléfono..."
-            />
-            {buscando && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <div className="w-5 h-5 border-2 border-[#10b981] border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-          </div>
-
-          {/* Dropdown de resultados */}
-          {mostrarResultados && (
-            <div className="absolute z-10 w-full mt-2 bg-[#1e293b] border border-[#334155] rounded-lg shadow-xl max-h-60 overflow-y-auto">
-              {resultados.length > 0 ? (
-                resultados.map((e) => (
-                  <button
-                    key={String(e._id)}
-                    type="button"
-                    onClick={() => seleccionarEmpresa(e)}
-                    className="w-full px-4 py-3 text-left hover:bg-[#334155] transition-colors flex items-center gap-3"
-                  >
-                    <div className="w-8 h-8 bg-[#334155] rounded-full flex items-center justify-center">
-                      <Building2 size={16} className="text-slate-400" />
-                    </div>
-                    <div>
-                      <p className="text-white text-sm">{e.razonSocial}</p>
-                      <p className="text-slate-500 text-xs">RUT: {e.rut}</p>
-                    </div>
-                  </button>
-                ))
-              ) : busqueda.length >= 2 ? (
-                <div className="px-4 py-3 text-slate-400 text-sm">
-                  No se encontraron resultados
-                </div>
-              ) : null}
-            </div>
-          )}
-
-          {/* Botón para crear nueva empresa */}
-          <button
-            type="button"
-            onClick={() => {
-              setModoCrear(true);
-              setMostrarResultados(false);
-              // Pre-llenar con la búsqueda si existe
-              if (busqueda) {
-                setNuevaEmpresa(prev => ({ ...prev, razonSocial: busqueda.toUpperCase() }));
-              }
-            }}
-            className="mt-3 w-full px-4 py-3 bg-[#334155] hover:bg-[#475569] text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            <Building2 size={18} />
-            Crear Nueva Empresa
-          </button>
         </div>
       )}
     </div>

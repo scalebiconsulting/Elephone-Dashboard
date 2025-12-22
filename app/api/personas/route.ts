@@ -18,10 +18,11 @@ export async function GET(request: Request) {
 
     let query: Record<string, unknown> = {};
 
-    // Búsqueda por nombre o teléfono
+    // Búsqueda por RUN (exacta) o por nombre/teléfono/correo
     if (busqueda) {
       query = {
         $or: [
+          { run: busqueda }, // Búsqueda exacta por RUN
           { nombre: { $regex: busqueda, $options: 'i' } },
           { telefono: { $regex: busqueda, $options: 'i' } },
           { correo: { $regex: busqueda, $options: 'i' } },
@@ -74,8 +75,8 @@ export async function POST(request: Request) {
     const db = client.db(DB_NAME);
     const collection = db.collection<Persona>(COLLECTION_NAME);
 
-    // Verificar si ya existe por teléfono
-    const existente = await collection.findOne({ telefono: body.telefono });
+    // Verificar si ya existe por RUN
+    const existente = await collection.findOne({ run: body.run });
     if (existente) {
       // Si existe, actualizar roles si es necesario
       const nuevosRoles = [...new Set([...existente.roles, ...(body.roles || ['CLIENTE'])])];
@@ -86,9 +87,10 @@ export async function POST(request: Request) {
             roles: nuevosRoles,
             updatedAt: new Date(),
             // Actualizar otros campos si vienen
-            ...(body.nombre && { nombre: body.nombre }),
+            ...(body.nombre && { nombre: body.nombre.toUpperCase() }),
             ...(body.correo && { correo: body.correo }),
-            ...(body.direccion && { direccion: body.direccion }),
+            ...(body.telefono && { telefono: body.telefono }),
+            ...(body.direccion && { direccion: body.direccion.toUpperCase() }),
           }
         }
       );

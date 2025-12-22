@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, UserPlus, X, Check, User, Upload, FileText, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, Check, User, Upload, FileText, Trash2, Loader2, CheckCircle2 } from 'lucide-react';
 import { Persona } from '@/app/types/producto';
 
 interface SelectorPersonaProps {
@@ -29,75 +29,59 @@ export default function SelectorPersona({
   titulo = 'Datos de la Persona',
   showDocumentos = true,
 }: SelectorPersonaProps) {
-  const [busqueda, setBusqueda] = useState('');
-  const [resultados, setResultados] = useState<Persona[]>([]);
-  const [buscando, setBuscando] = useState(false);
-  const [mostrarResultados, setMostrarResultados] = useState(false);
-  const [modoCrear, setModoCrear] = useState(true);
   const [nuevaPersona, setNuevaPersona] = useState<Persona>({ ...PERSONA_VACIA, roles });
   const [guardando, setGuardando] = useState(false);
-  
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [buscandoRun, setBuscandoRun] = useState(false);
+  const [runEncontrado, setRunEncontrado] = useState(false);
 
-  // Buscar personas
-  const buscarPersonas = useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setResultados([]);
+  // Buscar persona por RUN
+  const buscarPorRun = useCallback(async (run: string) => {
+    if (run.length < 8) {
+      setRunEncontrado(false);
       return;
     }
 
-    setBuscando(true);
+    setBuscandoRun(true);
     try {
-      const response = await fetch(`/api/personas?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/personas?q=${encodeURIComponent(run)}`);
       if (response.ok) {
         const data = await response.json();
-        setResultados(data);
-        setMostrarResultados(true);
+        const personaEncontrada = data.find((p: Persona) => 
+          p.run?.replace(/[.-]/g, '') === run.replace(/[.-]/g, '')
+        );
+        
+        if (personaEncontrada) {
+          // Limpiar documentos de búsquedas anteriores
+          setNuevaPersona({ ...personaEncontrada, documentos: [] });
+          setRunEncontrado(true);
+        } else {
+          setRunEncontrado(false);
+        }
       }
     } catch (error) {
-      console.error('Error al buscar personas:', error);
+      console.error('Error al buscar por RUN:', error);
+      setRunEncontrado(false);
     } finally {
-      setBuscando(false);
+      setBuscandoRun(false);
     }
   }, []);
 
-  // Debounce para búsqueda
+  // Debounce para búsqueda por RUN
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (busqueda && !persona) {
-        buscarPersonas(busqueda);
+      if (nuevaPersona.run && !persona) {
+        buscarPorRun(nuevaPersona.run);
       }
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timer);
-  }, [busqueda, persona, buscarPersonas]);
-
-  // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setMostrarResultados(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Seleccionar persona existente
-  const seleccionarPersona = (p: Persona) => {
-    onPersonaChange(p);
-    setBusqueda('');
-    setMostrarResultados(false);
-    setModoCrear(false);
-  };
+  }, [nuevaPersona.run, persona, buscarPorRun]);
 
   // Limpiar selección
   const limpiarSeleccion = () => {
     onPersonaChange(null);
-    setBusqueda('');
     setNuevaPersona({ ...PERSONA_VACIA, roles });
+    setRunEncontrado(false);
   };
 
   // Crear nueva persona
@@ -120,8 +104,8 @@ export default function SelectorPersona({
       if (response.ok) {
         const data = await response.json();
         onPersonaChange(data.data);
-        setModoCrear(false);
         setNuevaPersona({ ...PERSONA_VACIA, roles });
+        setRunEncontrado(false);
       }
     } catch (error) {
       console.error('Error al crear persona:', error);
@@ -177,7 +161,7 @@ export default function SelectorPersona({
 
       {/* Persona seleccionada */}
       {persona && persona._id ? (
-        <div className="bg-[#0f172a] border border-[#0ea5e9] rounded-lg p-4">
+        <div className="bg-[#0f172a] border border-[#0ea5e9] rounded-lg p-4 max-w-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-[#0ea5e9] rounded-full flex items-center justify-center">
@@ -205,10 +189,38 @@ export default function SelectorPersona({
             </button>
           </div>
         </div>
-      ) : modoCrear ? (
-        /* Formulario para crear nueva persona */
+      ) : (
+        /* Formulario para crear/editar persona */
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative">
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                RUN <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={nuevaPersona.run}
+                  onChange={(e) => updateNuevaPersona('run', e.target.value)}
+                  className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                  placeholder="12.345.678-9"
+                  maxLength={12}
+                />
+                {buscandoRun && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 size={18} className="text-[#0ea5e9] animate-spin" />
+                  </div>
+                )}
+                {!buscandoRun && runEncontrado && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CheckCircle2 size={18} className="text-green-400" />
+                  </div>
+                )}
+              </div>
+              {runEncontrado && (
+                <p className="text-green-400 text-xs mt-1">✓ Persona encontrada en base de datos</p>
+              )}
+            </div>
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
                 NOMBRE <span className="text-red-500">*</span>
@@ -219,19 +231,6 @@ export default function SelectorPersona({
                 onChange={(e) => updateNuevaPersona('nombre', e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
                 placeholder="Nombre completo"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                RUN <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={nuevaPersona.run}
-                onChange={(e) => updateNuevaPersona('run', e.target.value)}
-                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-                placeholder="12.345.678-9"
-                maxLength={12}
               />
             </div>
             <div>
@@ -247,7 +246,7 @@ export default function SelectorPersona({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">CORREO</label>
+              <label className="block text-sm font-medium text-slate-400 mb-2">CORREO <span className="text-red-500">*</span></label>
               <input
                 type="email"
                 value={nuevaPersona.correo}
@@ -256,8 +255,8 @@ export default function SelectorPersona({
                 placeholder="correo@ejemplo.com"
               />
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-400 mb-2">DIRECCIÓN</label>
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-slate-400 mb-2">DIRECCIÓN <span className="text-red-500">*</span></label>
               <input
                 type="text"
                 value={nuevaPersona.direccion}
@@ -274,10 +273,10 @@ export default function SelectorPersona({
               <label className="block text-sm font-medium text-slate-400 mb-2">
                 DOCUMENTOS
               </label>
-              <div className="flex flex-col gap-3">
-                <label className="flex items-center justify-center gap-2 px-4 py-3 bg-[#0f172a] border border-dashed border-[#334155] rounded-lg text-slate-400 hover:border-[#0ea5e9] hover:text-[#0ea5e9] cursor-pointer transition-colors">
-                  <Upload size={18} />
-                  <span>Subir documentos (máx. 5MB c/u)</span>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 px-3 py-2 bg-[#0f172a] border border-dashed border-[#334155] rounded-lg text-slate-400 hover:border-[#0ea5e9] hover:text-[#0ea5e9] cursor-pointer transition-colors text-sm">
+                  <Upload size={16} />
+                  <span>Subir documentos</span>
                   <input
                     type="file"
                     multiple
@@ -293,18 +292,18 @@ export default function SelectorPersona({
                     {nuevaPersona.documentos.map((doc, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 px-3 py-2 bg-[#0f172a] border border-[#334155] rounded-lg"
+                        className="flex items-center gap-2 px-2 py-1 bg-[#0f172a] border border-[#334155] rounded-lg"
                       >
-                        <FileText size={16} className="text-[#0ea5e9]" />
-                        <span className="text-white text-sm">
-                          Documento {index + 1}
+                        <FileText size={14} className="text-[#0ea5e9]" />
+                        <span className="text-white text-xs">
+                          Doc {index + 1}
                         </span>
                         <button
                           type="button"
                           onClick={() => removeDocumento(index)}
-                          className="p-1 text-slate-400 hover:text-red-400 transition-colors"
+                          className="p-0.5 text-slate-400 hover:text-red-400 transition-colors"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={12} />
                         </button>
                       </div>
                     ))}
@@ -314,14 +313,13 @@ export default function SelectorPersona({
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={() => {
-                setModoCrear(false);
-                setNuevaPersona({ ...PERSONA_VACIA, roles });
+                limpiarSeleccion();
               }}
-              className="flex-1 px-4 py-3 bg-[#334155] hover:bg-[#475569] text-white rounded-lg transition-colors"
+              className="px-4 py-2 bg-[#334155] hover:bg-[#475569] text-white rounded-lg transition-colors text-sm"
             >
               Cancelar
             </button>
@@ -329,78 +327,12 @@ export default function SelectorPersona({
               type="button"
               onClick={crearPersona}
               disabled={guardando || !nuevaPersona.nombre || !nuevaPersona.run || !nuevaPersona.telefono}
-              className="flex-1 px-4 py-3 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="px-4 py-2 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
             >
-              <Check size={18} />
+              <Check size={16} />
               {guardando ? 'Guardando...' : 'Guardar Persona'}
             </button>
           </div>
-        </div>
-      ) : (
-        /* Buscador de personas */
-        <div className="relative" ref={dropdownRef}>
-          <div className="relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              onFocus={() => busqueda.length >= 2 && setMostrarResultados(true)}
-              className="w-full pl-12 pr-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
-              placeholder="Buscar por nombre, teléfono o correo..."
-            />
-            {buscando && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <div className="w-5 h-5 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-          </div>
-
-          {/* Dropdown de resultados */}
-          {mostrarResultados && (
-            <div className="absolute z-10 w-full mt-2 bg-[#1e293b] border border-[#334155] rounded-lg shadow-xl max-h-60 overflow-y-auto">
-              {resultados.length > 0 ? (
-                resultados.map((p) => (
-                  <button
-                    key={String(p._id)}
-                    type="button"
-                    onClick={() => seleccionarPersona(p)}
-                    className="w-full px-4 py-3 text-left hover:bg-[#334155] transition-colors flex items-center gap-3"
-                  >
-                    <div className="w-8 h-8 bg-[#334155] rounded-full flex items-center justify-center">
-                      <User size={16} className="text-slate-400" />
-                    </div>
-                    <div>
-                      <p className="text-white text-sm">{p.nombre}</p>
-                      <p className="text-slate-500 text-xs">{p.telefono}</p>
-                    </div>
-                  </button>
-                ))
-              ) : busqueda.length >= 2 ? (
-                <div className="px-4 py-3 text-slate-400 text-sm">
-                  No se encontraron resultados
-                </div>
-              ) : null}
-            </div>
-          )}
-
-          {/* Botón para crear nueva persona */}
-          <button
-            type="button"
-            onClick={() => {
-              setModoCrear(true);
-              setMostrarResultados(false);
-              // Pre-llenar con la búsqueda si parece un nombre
-              if (busqueda && !/^\d+$/.test(busqueda)) {
-                setNuevaPersona(prev => ({ ...prev, nombre: busqueda.toUpperCase() }));
-              }
-            }}
-            className="mt-3 w-full px-4 py-3 bg-[#334155] hover:bg-[#475569] text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            <UserPlus size={18} />
-            Crear Nueva Persona
-          </button>
         </div>
       )}
     </div>
