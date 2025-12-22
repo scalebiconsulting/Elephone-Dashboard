@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ProductoFormState, ProductoFormActions, ProductoData, Persona, PagoProveedor } from '@/app/types/producto';
+import { ProductoFormState, ProductoFormActions, ProductoData, Persona, Empresa, PagoProveedor } from '@/app/types/producto';
 import { formatoPesosChilenos, extraerNumero, calcularUtilidad } from '@/app/utils/formatters';
 import { generarCorrelativo, generarModelo2, generarConcatenacion } from '@/app/utils/generators';
 import { VALORES_INICIALES } from '@/app/constants/opciones';
@@ -20,6 +20,10 @@ const PAGO_PROVEEDOR_INICIAL: PagoProveedor = {
 export interface UseProductoFormReturn extends ProductoFormState, ProductoFormActions {
   pagoProveedor: PagoProveedor;
   setPagoProveedor: (pago: PagoProveedor) => void;
+  tipoProveedor: 'PERSONA' | 'EMPRESA';
+  setTipoProveedor: (tipo: 'PERSONA' | 'EMPRESA') => void;
+  empresa: Empresa | null;
+  setEmpresa: (empresa: Empresa | null) => void;
 }
 
 export function useProductoForm(): UseProductoFormReturn {
@@ -38,7 +42,9 @@ export function useProductoForm(): UseProductoFormReturn {
   const [sku, setSku] = useState('');
   const [condicionBateria, setCondicionBateria] = useState('');
   const [costo, setCosto] = useState('');
+  const [tipoProveedor, setTipoProveedor] = useState<'PERSONA' | 'EMPRESA'>('PERSONA');
   const [persona, setPersona] = useState<Persona | null>(null);
+  const [empresa, setEmpresa] = useState<Empresa | null>(null);
   const [fechaCompra, setFechaCompra] = useState('');
 
   // Sección 3 - Observaciones
@@ -222,7 +228,7 @@ export function useProductoForm(): UseProductoFormReturn {
   const resetForm = useCallback(() => {
     setEquipo(''); setModelo(''); setColor(''); setSubModelo(''); setSerie('');
     setGb(''); setCondicion(''); setSku(''); setCondicionBateria('');
-    setCosto(''); setPersona(null); 
+    setCosto(''); setTipoProveedor('PERSONA'); setPersona(null); setEmpresa(null);
     setFechaCompra(''); setObservacion('');
     setFallaMacOnline(''); setGarantiaCompra(''); setBlock(VALORES_INICIALES.block);
     setImei1(''); setImei2('');
@@ -242,6 +248,28 @@ export function useProductoForm(): UseProductoFormReturn {
     setLoading(true);
 
     try {
+      // Construir datos del proveedor según el tipo
+      let proveedorData;
+      if (tipoProveedor === 'PERSONA' && persona) {
+        proveedorData = {
+          tipo: 'PERSONA' as const,
+          personaId: persona._id ? String(persona._id) : undefined,
+          nombre: persona.nombre,
+          identificador: persona.run,
+        };
+      } else if (tipoProveedor === 'EMPRESA' && empresa) {
+        proveedorData = {
+          tipo: 'EMPRESA' as const,
+          empresaId: empresa._id ? String(empresa._id) : undefined,
+          nombre: empresa.razonSocial,
+          identificador: empresa.rut,
+        };
+      } else {
+        alert('❌ Debe seleccionar un proveedor');
+        setLoading(false);
+        return;
+      }
+
       const productoData: ProductoData = {
         equipo,
         modelo,
@@ -254,8 +282,8 @@ export function useProductoForm(): UseProductoFormReturn {
         sku,
         condicionBateria: parseInt(condicionBateria) || 0,
         costo: extraerNumero(costo),
-        proveedor: persona?.nombre || '',
-        personaId: persona?._id ? String(persona._id) : undefined,
+        proveedor: proveedorData.nombre,
+        personaId: proveedorData.personaId,
         fechaCompra,
         observacion,
         fallaMacOnline,
@@ -300,7 +328,7 @@ export function useProductoForm(): UseProductoFormReturn {
     }
   }, [
     equipo, modelo, color, subModelo, serie, gb, condicion, modelo2, sku,
-    condicionBateria, costo, persona, fechaCompra, observacion, fallaMacOnline,
+    condicionBateria, costo, tipoProveedor, persona, empresa, fechaCompra, observacion, fallaMacOnline,
     garantiaCompra, block, datosEquipos, numeroSerie, imei1, imei2, concatenacion,
     estado, fecha, metodoPago, pagoProveedor, repuesto, pvpEfectivo, pvpCredito, utilidad,
     utilidad2, tresPorCiento, resetForm
@@ -330,7 +358,7 @@ export function useProductoForm(): UseProductoFormReturn {
   return {
     // State
     equipo, modelo, color, subModelo, serie, gb, condicion, modelo2,
-    correlativo, sku, condicionBateria, costo, persona, fechaCompra,
+    correlativo, sku, condicionBateria, costo, tipoProveedor, persona, empresa, fechaCompra,
     observacion, fallaMacOnline, garantiaCompra, block, datosEquipos,
     numeroSerie, imei1, imei2, concatenacion, estado, fecha, metodoPago,
     pagoProveedor,
@@ -341,7 +369,7 @@ export function useProductoForm(): UseProductoFormReturn {
     setEquipo, setModelo, setColor, setSubModelo, setSerie, setGb, setCondicion,
     setCondicionBateria, 
     setCosto: handleSetCosto,
-    setPersona, setFechaCompra,
+    setTipoProveedor, setPersona, setEmpresa, setFechaCompra,
     setObservacion, setFallaMacOnline, setGarantiaCompra, setBlock, setDatosEquipos,
     setNumeroSerie, setImei1, setImei2, setEstado, setFecha,
     setPagoProveedor,

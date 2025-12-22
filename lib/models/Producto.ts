@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
 
-// Interface para datos del proveedor
+// Interface para datos del proveedor (tipo PERSONA o EMPRESA)
 export interface ProveedorData {
-  nombre: string;
-  correo: string;
-  telefono: string;
-  direccion: string;
-  documentos: string[]; // base64 strings
+  tipo: 'PERSONA' | 'EMPRESA';
+  personaId?: string | ObjectId;
+  empresaId?: string | ObjectId;
+  nombre: string; // Nombre persona o razón social empresa
+  identificador: string; // RUN o RUT
 }
 
 // Interface para cuotas de pago prorrateado

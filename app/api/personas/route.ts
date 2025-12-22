@@ -108,6 +108,7 @@ export async function POST(request: Request) {
       direccion: body.direccion?.toUpperCase() || '',
       documentos: body.documentos || [],
       roles: body.roles || ['CLIENTE'],
+      run: body.run || '',
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -14,6 +14,7 @@ interface SelectorPersonaProps {
 
 const PERSONA_VACIA: Persona = {
   nombre: '',
+  run: '',
   correo: '',
   telefono: '',
   direccion: '',
@@ -32,7 +33,7 @@ export default function SelectorPersona({
   const [resultados, setResultados] = useState<Persona[]>([]);
   const [buscando, setBuscando] = useState(false);
   const [mostrarResultados, setMostrarResultados] = useState(false);
-  const [modoCrear, setModoCrear] = useState(false);
+  const [modoCrear, setModoCrear] = useState(true);
   const [nuevaPersona, setNuevaPersona] = useState<Persona>({ ...PERSONA_VACIA, roles });
   const [guardando, setGuardando] = useState(false);
   
@@ -185,8 +186,11 @@ export default function SelectorPersona({
               <div>
                 <p className="text-white font-medium">{persona.nombre}</p>
                 <p className="text-slate-400 text-sm">
-                  {persona.telefono} {persona.correo && `• ${persona.correo}`}
+                  RUN: {persona.run} • {persona.telefono}
                 </p>
+                {persona.correo && (
+                  <p className="text-slate-500 text-xs">{persona.correo}</p>
+                )}
                 {persona.direccion && (
                   <p className="text-slate-500 text-xs">{persona.direccion}</p>
                 )}
@@ -219,6 +223,19 @@ export default function SelectorPersona({
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
+                RUN <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={nuevaPersona.run}
+                onChange={(e) => updateNuevaPersona('run', e.target.value)}
+                className="w-full px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9]"
+                placeholder="12.345.678-9"
+                maxLength={12}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
                 TELÉFONO <span className="text-red-500">*</span>
               </label>
               <input
@@ -239,7 +256,7 @@ export default function SelectorPersona({
                 placeholder="correo@ejemplo.com"
               />
             </div>
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium text-slate-400 mb-2">DIRECCIÓN</label>
               <input
                 type="text"
@@ -311,7 +328,7 @@ export default function SelectorPersona({
             <button
               type="button"
               onClick={crearPersona}
-              disabled={guardando || !nuevaPersona.nombre || !nuevaPersona.telefono}
+              disabled={guardando || !nuevaPersona.nombre || !nuevaPersona.run || !nuevaPersona.telefono}
               className="flex-1 px-4 py-3 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Check size={18} />

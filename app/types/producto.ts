@@ -1,9 +1,10 @@
 // Tipos para el formulario de productos
 import type { ProveedorData } from '@/lib/models/Producto';
 import type { Persona } from '@/lib/models/Persona';
+import type { Empresa } from '@/lib/models/Empresa';
 
-// Re-exportar Persona desde el modelo central (evita duplicación)
-export type { Persona };
+// Re-exportar Persona y Empresa desde el modelo central (evita duplicación)
+export type { Persona, Empresa };
 
 // Interface para cuotas de pago prorrateado
 export interface CuotaPago {
@@ -92,7 +93,9 @@ export interface ProductoFormState {
   sku: string;
   condicionBateria: string;
   costo: string;
+  tipoProveedor: 'PERSONA' | 'EMPRESA';
   persona: Persona | null;
+  empresa: Empresa | null;
   fechaCompra: string;
 
   // Sección 3 - Observaciones
@@ -139,7 +142,9 @@ export interface ProductoFormActions {
   setCondicion: (value: string) => void;
   setCondicionBateria: (value: string) => void;
   setCosto: (value: string) => void;
+  setTipoProveedor: (tipo: 'PERSONA' | 'EMPRESA') => void;
   setPersona: (persona: Persona | null) => void;
+  setEmpresa: (empresa: Empresa | null) => void;
   setFechaCompra: (value: string) => void;
   setObservacion: (value: string) => void;
   setFallaMacOnline: (value: string) => void;

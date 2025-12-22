@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 export interface Persona {
   _id?: string | ObjectId;
   nombre: string;
+  run: string; // Rol Único Nacional (Chile)
   correo: string;
   telefono: string;
   direccion: string;

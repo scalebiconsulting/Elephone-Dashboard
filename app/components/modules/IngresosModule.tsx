@@ -12,6 +12,7 @@ import {
   BasaleExport
 } from '@/app/components/forms/ingresos';
 import SelectorPersona from '@/app/components/forms/shared/SelectorPersona';
+import SelectorEmpresa from '@/app/components/forms/shared/SelectorEmpresa';
 import PagoProveedorSection from '@/app/components/forms/ingresos/PagoProveedorSection';
 
 export default function IngresosModule() {
@@ -65,15 +66,36 @@ export default function IngresosModule() {
           setFechaCompra={form.setFechaCompra}
         />
 
-        {/* Sección 2.1 - Datos del Proveedor */}
-        <SelectorPersona
-          persona={form.persona}
-          onPersonaChange={form.setPersona}
-          roles={['PROVEEDOR']}
-          titulo="Datos del Proveedor"
-        />
+        {/* Sección 2.1 - Selector de Tipo de Proveedor */}
+        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Tipo de Proveedor</h2>
+          <select
+            value={form.tipoProveedor}
+            onChange={(e) => form.setTipoProveedor(e.target.value as 'PERSONA' | 'EMPRESA')}
+            className="w-64 px-4 py-3 bg-[#0f172a] border border-[#334155] rounded-lg text-white focus:outline-none focus:border-[#0ea5e9] text-lg"
+          >
+            <option value="PERSONA">👤 Persona Natural</option>
+            <option value="EMPRESA">🏢 Empresa</option>
+          </select>
+        </div>
 
-        {/* Sección 2.2 - Pago a Proveedor */}
+        {/* Sección 2.2 - Datos del Proveedor (Persona o Empresa) */}
+        {form.tipoProveedor === 'PERSONA' ? (
+          <SelectorPersona
+            persona={form.persona}
+            onPersonaChange={form.setPersona}
+            roles={['PROVEEDOR']}
+            titulo="Datos del Proveedor (Persona)"
+          />
+        ) : (
+          <SelectorEmpresa
+            empresa={form.empresa}
+            onEmpresaChange={form.setEmpresa}
+            titulo="Datos del Proveedor (Empresa)"
+          />
+        )}
+
+        {/* Sección 2.3 - Pago a Proveedor */}
         <PagoProveedorSection
           costo={form.costo}
           pagoProveedor={form.pagoProveedor}
